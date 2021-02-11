@@ -1,11 +1,11 @@
-import requests, time, json
+import requests, json, time
+from datetime import datetime
 
 def clear():
     print("\033c", end="")
 
 class Weather():
     def __init__(self, location):
-        super(Weather, self).__init__()
         self.location = location
 
     def fetch(self):
@@ -21,7 +21,35 @@ class Weather():
         self.data = self.data.replace("\u001b[0m", "\u001b[0m"+white) #show white text
 
         #arrow replacement with directions
-        self.timestamp = time.strftime("%b %d @ %I:%M %p")
+        unicode_arrows = [
+            ("\u2192", "W"),
+            ("\u2190", "E"),
+            ("\u2191", "S"),
+            ("\u2193", "N"),
+            ("\u2196", "SE"),
+            ("\u2197", "SW"),
+            ("\u2198", "NW"),
+            ("\u2199", "NE")]
+
+        divider = "\u0020\u0020\n\u0020\u0020\u0020"
+        for arrow in unicode_arrows:
+            self.data = self.data.replace(arrow[0], arrow[1])
+            #remove extra spaces
+            if len(arrow[1]) == 2:
+                split_header = self.data.split(divider)
+                raw = split_header[1].split(arrow[1]) #split where directions were inserted
+                new = [raw[0]]
+                for e in raw[1:]:
+                    raw_sub = e.split("\u2502") #split each element at vertical line
+                    raw_sub[0] = raw_sub[0][:-1] #remove a space from the end of the first element
+                    new = new + ["\u2502".join(raw_sub)] #rejoin
+                split_header[1] = arrow[1].join(new) #rejoin
+                self.data = divider.join(split_header)
+
+        res = requests.get("http://worldtimeapi.org/api/ip")
+        res = res.json()
+        self.timestamp = datetime.strptime(res['datetime'], "%Y-%m-%dT%H:%M:%S.%f%z")
+        self.timestamp = self.timestamp.strftime("%b %d @ %I:%M %p")
 
 if __name__ == '__main__':
     weather = Weather('Toronto')
