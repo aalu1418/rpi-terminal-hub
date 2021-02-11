@@ -20,6 +20,10 @@ class Weather():
         self.data = white + self.data #show white text
         self.data = self.data.replace("\u001b[0m", "\u001b[0m"+white) #show white text
 
+        #mission character replacements
+        self.data = self.data.replace("\u2015", "\u2500") #fix horizontal lines
+        self.data = self.data.replace("\u2019", "\u00B4") #fix horizontal lines
+
         #arrow replacement with directions
         unicode_arrows = [
             ("\u2192", "W"),
