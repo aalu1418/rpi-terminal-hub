@@ -1,7 +1,6 @@
 # example: https://fishandwhistle.net/post/2016/raspberry-pi-pure-python-infrared-remote-control/
 
 from gpiozero import LineSensor
-from signal import pause
 import time
 
 sensor = LineSensor(17, sample_rate=38000, queue_len=1)
@@ -16,9 +15,25 @@ start = time.time()
 for i in range(15000):
     data.append(sensor.value)
 
-print(sum(data), len(data), time.time()-start)
+duration = time.time()-start
 print("".join([str(i) for i in data]))
 
+value = 0
+parsed = {0: [], 1:[]}
 
+# sorting data into struct
+count = 0
+for v in data:
+    if v == value:
+        count += 1
+    else:
+        parsed[value].append(count*duration/len(data))
+        count = 0
+        value = int(not(value))
 
-# if __name__ == "__main__":
+# add last count to data struct
+parsed[value].append(count*duration/len(data))
+
+for i in range(len(parsed[0])):
+    print("On: ", parsed[0][i])
+    print("Off: ", parsed[1][i], "\n")
