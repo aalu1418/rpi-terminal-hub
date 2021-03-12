@@ -16,7 +16,7 @@ for i in range(15000):
     data.append(sensor.value)
 
 duration = time.time()-start
-print("".join([str(i) for i in data]))
+print("Total duration: ", duration, "\n")
 
 value = 0
 parsed = {0: [], 1:[]}
