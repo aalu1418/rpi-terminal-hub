@@ -8,8 +8,13 @@ sensor = LineSensor(17, sample_rate=2000)
 # sensor.when_no_line = lambda: print('No line detected')
 # pause()
 
-while True:
-    print(sensor.value)
+data = []
+sensor.wait_for_line()
+
+for i in range(2000):
+    data.append(sensor.value)
+
+print(sum(data), len(data))
 
 
 
