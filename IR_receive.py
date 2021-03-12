@@ -1,15 +1,12 @@
 # example: https://fishandwhistle.net/post/2016/raspberry-pi-pure-python-infrared-remote-control/
 
-from gpiozero import LED
-from time import sleep
+from gpiozero import LineSensor
+from signal import pause
 
-red = LED(17)
-
-while True:
-    red.on()
-    sleep(1)
-    red.off()
-    sleep(1)
+sensor = LineSensor(17)
+sensor.when_line = lambda: print('Line detected')
+sensor.when_no_line = lambda: print('No line detected')
+pause()
 
 
 
