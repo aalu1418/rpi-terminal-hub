@@ -4,7 +4,7 @@ from gpiozero import LineSensor
 from signal import pause
 import time
 
-sensor = LineSensor(17, sample_rate=2000)
+sensor = LineSensor(17, sample_rate=38000, queue_len=1)
 # sensor.when_line = lambda: print('Line detected')
 # sensor.when_no_line = lambda: print('No line detected')
 # pause()
@@ -13,7 +13,7 @@ data = []
 sensor.wait_for_line()
 
 start = time.time()
-while time.time()-start < 1:
+for i in range(15000):
     data.append(sensor.value)
 
 print(sum(data), len(data), time.time()-start)
