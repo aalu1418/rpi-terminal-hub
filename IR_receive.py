@@ -13,10 +13,11 @@ data = []
 sensor.wait_for_line()
 
 start = time.time()
-for i in range(2000):
+while time.time()-start < 1:
     data.append(sensor.value)
 
 print(sum(data), len(data), time.time()-start)
+print("".join([str(i) for i in data]))
 
 
 
