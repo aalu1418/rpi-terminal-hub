@@ -16,7 +16,7 @@ class Emitter:
                 file.close()
                 self.data = json.loads(raw)
             except Exception as e:
-                print("error loading file")
+                print("ERROR LOADING FILE:", e)
 
     def run(self):
         if self.data is None:
@@ -26,11 +26,11 @@ class Emitter:
 
     # blink based on file
     def emit(self):
-        for i in len(self.data[0]):
+        for i in range(len(self.data["0"])):
             self.led.on()
-            time.sleep(self.data[0][i])
+            time.sleep(self.data["0"][i])
             self.led.off()
-            time.sleep(self.data[1][i])
+            time.sleep(self.data["1"][i])
 
     # blink for 10 seconds
     def blink(self):
