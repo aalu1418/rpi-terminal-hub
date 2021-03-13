@@ -26,7 +26,7 @@ class Eufy:
 
 if __name__ == '__main__':
     if '--pair' in sys.argv:
-        eufy = Eufy(emitter=18, receiver=17)
+        eufy = Eufy(emitter=27, receiver=17)
         eufy.pair()
     else:
         eufy = Eufy(filename='eufy.json')
