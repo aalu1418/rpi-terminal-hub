@@ -6,7 +6,7 @@ import time
 
 class Emitter:
     def __init__(self, GPIO, filename=None):
-        self.led = PWMLED(GPIO)
+        self.led = PWMLED(GPIO, frequency=38000)
         self.data = None
 
         if filename is not None:
