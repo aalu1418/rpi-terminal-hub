@@ -12,3 +12,7 @@ GPIO IR Sensor
 GPIO IR Emitter
 * (Circult) https://www.hackster.io/austin-stanton/creating-a-raspberry-pi-universal-remote-with-lirc-2fd581
 * https://gpiozero.readthedocs.io/en/stable/api_output.html#pwmled
+
+ToDo:
+ - IR emitter
+ - Documentation

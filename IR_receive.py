@@ -5,7 +5,7 @@ from time import time
 import json
 import sys
 
-class Receiver():
+class Receiver:
     def __init__(self, GPIO):
         self.GPIO = GPIO
         self.data = []
