@@ -1,5 +1,5 @@
 import requests, json, time
-from datetime import datetime
+from webTime import WebTime
 
 def clear():
     print("\033c", end="")
@@ -50,17 +50,14 @@ class Weather():
                 split_header[1] = arrow[1].join(new) #rejoin
                 self.data = divider.join(split_header)
 
-        res = requests.get("http://worldtimeapi.org/api/ip")
-        res = res.json()
-        self.timestamp = datetime.strptime(res['datetime'], "%Y-%m-%dT%H:%M:%S.%f%z")
-        self.timestamp = self.timestamp.strftime("%b %d @ %I:%M %p")
-
 if __name__ == '__main__':
     weather = Weather('Toronto')
+    webTime = WebTime()
     clear()
     while True:
         weather.fetch()
         print(weather.data)
-        print(f"Last updated: {weather.timestamp}")
+        webTime.fetch()
+        print(f"Last updated: {webTime.timestamp}")
         time.sleep(15*60)
         clear()
