@@ -4,9 +4,14 @@ from webTime import WebTime
 from time import time, sleep
 import os
 from datetime import datetime
+import sys
+from flask import Flask
+app = Flask(__name__)
+app.output_data = "Hello, World" # storing data for output
 
+# ------ MAIN LOOP ------------
 class Loop():
-    def __init__(self, location='Toronto', filename='eufy.json', increment=15, autorun=True, schedule={}):
+    def __init__(self, schedule={}, cli=True, output=None, location='Toronto', filename='eufy.json', increment=15, autorun=True):
         self.startup()
         self.webTime = WebTime()
         self.weather = Weather(location)
@@ -14,6 +19,8 @@ class Loop():
         self.increment = increment
         self.schedule = {k:datetime.strptime(schedule[k],"%I%p").hour for k in schedule.keys()}
         self.runToday = False
+        self.cli = cli
+        self.output = output
 
         if autorun:
             self.loop()
@@ -49,27 +56,53 @@ class Loop():
     def loop(self):
         clear() #clear loaded data
         while True:
+            output = []
+
             self.weather.fetch()
             self.webTime.fetch()
-
-            # output info to CLI
-            print(self.weather.data)
-            print(f"Last updated: {self.webTime.timestamp}")
+            output.append(self.weather.data)
+            output.append(f"Last updated: {self.webTime.timestamp}")
 
             # scheduled tasks
             if scheduler():
                 self.eufy.emit('start_stop')
-                print("Eufy Started")
+                output.append("Eufy Started")
+
+            output = "\n".join(output)
+            if self.cli == False:
+                self.output.put(output)
+            else:
+                print(output)
+
 
             # pause until next interval
             self.delayCalc()
             sleep(self.delay)
             clear()
 
-
-
 if __name__ == '__main__':
+    cli = True
     schedule = {"Tuesday": "6PM",
                 "Thursday": "6PM",
                 "Saturday": "1PM"}
-    loop = Loop(schedule=schedule)
+
+    # requires multiprocessing to run Flask server + loop
+    if "--server" in sys.argv:
+        from multiprocessing import Process, Queue
+        output = Queue()
+        cli = False
+        p = Process(target=Loop, args=(schedule, cli, output))
+        p.start()
+
+        @app.route('/')
+        def index():
+            print(output.empty())
+            if not output.empty():
+                app.output_data = output.get()
+            return app.output_data
+
+        app.run()
+        p.join()
+
+    else:
+        loop = Loop(schedule)
