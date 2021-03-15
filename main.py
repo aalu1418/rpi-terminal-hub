@@ -11,7 +11,7 @@ app.output_data = "Hello, World" # storing data for output
 
 # ------ MAIN LOOP ------------
 class Loop():
-    def __init__(self, schedule={}, cli=True, output=None, location='Toronto', filename='eufy.json', increment=15, autorun=True):
+    def __init__(self, schedule={}, cli=True, output=None, location='Toronto', filename='/home/pi/rpi-terminal-hub/eufy.json', increment=15, autorun=True):
         self.startup()
         self.webTime = WebTime()
         self.weather = Weather(location)
@@ -64,7 +64,7 @@ class Loop():
             output.append(f"Last updated: {self.webTime.timestamp}")
 
             # scheduled tasks
-            if scheduler():
+            if self.scheduler():
                 self.eufy.emit('start_stop')
                 output.append("Eufy Started")
 
@@ -101,7 +101,7 @@ if __name__ == '__main__':
                 app.output_data = output.get()
             return app.output_data
 
-        app.run()
+        app.run(host='0.0.0.0')
         p.join()
 
     else:

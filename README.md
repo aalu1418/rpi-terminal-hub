@@ -16,8 +16,12 @@ Various integrations for controlling / reporting devices and information.
 `eufy.py`: Integration with IR emitter + receiver to control a Eufy Robovac 15C. The `eufy.json` file can be regenerated as well for other remotes.
 
 ## Notes
-Autorun on RPi
-* https://learn.sparkfun.com/tutorials/how-to-run-a-raspberry-pi-program-on-startup/all
+Autorun on RPi using CRON
+* https://phoenixnap.com/kb/crontab-reboot
+* Included a delay to allow internet connection to be established
+```
+@reboot sleep 60 && /usr/bin/python3 /home/pi/rpi-terminal-hub/main.py --server >> ~/cron.log 2>&1
+```
 
 Terminal Weather
 * https://github.com/chubin/wttr.in
