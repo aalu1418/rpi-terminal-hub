@@ -43,7 +43,7 @@ class Loop():
         minute = self.webTime.raw.minute
 
         # check at midnight if vacuum is supposed to be run today (or on startup)
-        if (hour == 0 and minute < 5) or self.Start:
+        if (hour == 0 and minute < 5) or self.start:
             if weekday in self.schedule.keys():
                 self.runToday = True
 
@@ -89,8 +89,8 @@ class Loop():
                 print(output)
 
             # clear start up triggers
-            if self.Start:
-                self.Start = False
+            if self.start:
+                self.start = False
 
             # pause until next interval
             self.delayCalc()
