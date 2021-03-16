@@ -71,10 +71,10 @@ class Weather():
         # regex split temp + feels like
         def split(t):
             t = re.split(r'[() ]{1,2}', t)
+            feel = t[1]
             if len(t) == 2:
-                t = " ".join(t)
-                return {"real": t, "feel": t}
-            return {"real": t[0]+" "+t[2], "feel": t[1]+" "+t[2]}
+                feel = t[0]
+            return {"real": t[0], "feel": feel, "unit": t[-1]}
 
         # current weather
         key = self.data.pop()
