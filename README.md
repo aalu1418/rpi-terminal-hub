@@ -29,3 +29,9 @@ Terminal Weather
 IR Receiver + Emitter
 * (Circult) https://www.hackster.io/austin-stanton/creating-a-raspberry-pi-universal-remote-with-lirc-2fd581
 * (Python Package) https://github.com/kentwait/ircodec
+
+Server Inspiration
+* https://shkspr.mobi/blog/2020/02/turn-an-old-ereader-into-an-information-screen-nook-str/
+
+ToDo:
+* Need to fix API request robustness issues

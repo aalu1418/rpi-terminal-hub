@@ -7,7 +7,7 @@ from datetime import datetime
 import sys
 from flask import Flask
 app = Flask(__name__)
-app.output_data = "Hello, World" # storing data for output
+app.output_data = ["Hello, World"] # storing data for output
 
 # ------ MAIN LOOP ------------
 class Loop():
@@ -58,8 +58,13 @@ class Loop():
         while True:
             output = []
 
-            self.weather.fetch()
-            self.webTime.fetch()
+            try:
+                self.weather.fetch()
+                self.webTime.fetch()
+            except Exception as e:
+                print(e)
+                return #retry fetch
+
             output.append(self.weather.data)
             output.append(f"Last updated: {self.webTime.timestamp}")
 
@@ -68,12 +73,11 @@ class Loop():
                 self.eufy.emit('start_stop')
                 output.append("Eufy Started")
 
-            output = "\n".join(output)
             if self.cli == False:
                 self.output.put(output)
             else:
+                output = "\n".join(output)
                 print(output)
-
 
             # pause until next interval
             self.delayCalc()
@@ -96,10 +100,9 @@ if __name__ == '__main__':
 
         @app.route('/')
         def index():
-            print(output.empty())
             if not output.empty():
                 app.output_data = output.get()
-            return app.output_data
+            return app.output_data[0]
 
         app.run(host='0.0.0.0')
         p.join()

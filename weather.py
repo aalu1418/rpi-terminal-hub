@@ -7,6 +7,7 @@ def clear():
 class Weather():
     def __init__(self, location):
         self.location = location
+        self.json = json
 
     def fetch(self):
         res = requests.get(f"https://wttr.in/{self.location}")
@@ -51,7 +52,7 @@ class Weather():
                 self.data = divider.join(split_header)
 
 if __name__ == '__main__':
-    weather = Weather('Toronto')
+    weather = Weather('Toronto', json=True)
     webTime = WebTime()
     clear()
     while True:

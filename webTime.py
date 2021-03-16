@@ -1,26 +1,18 @@
 from datetime import datetime
 import requests
 
-weekdays = {1: "Monday",
-            2: "Tuesday",
-            3: "Wednesday",
-            4: "Thursday",
-            5: "Friday",
-            6: "Saturday",
-            7: "Sunday"}
-
 class WebTime:
-    def __init__(self):
-        self.url = "http://worldtimeapi.org/api/ip"
-        self.fetch()
+    def __init__(self, timezone="est"):
+        self.url = f"http://worldclockapi.com/api/json/{timezone}/now"
 
     def fetch(self):
-        res = requests.get("http://worldtimeapi.org/api/ip")
+        res = requests.get(self.url)
         res = res.json()
-        self.raw = datetime.strptime(res['datetime'], "%Y-%m-%dT%H:%M:%S.%f%z")
+        self.raw = datetime.strptime(res['currentDateTime'], "%Y-%m-%dT%H:%M%z")
         self.timestamp = self.raw.strftime("%b %d @ %I:%M %p")
-        self.weekday = weekdays[self.raw.isoweekday()]
+        self.weekday = res["dayOfTheWeek"]
 
 if __name__ == '__main__':
     webTime = WebTime()
+    webTime.fetch()
     print(webTime.timestamp, webTime.weekday)
