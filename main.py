@@ -14,7 +14,7 @@ class Loop():
     def __init__(self, schedule={}, cli=True, output=None, location='Toronto', filename='/home/pi/rpi-terminal-hub/eufy.json', increment=15, autorun=True):
         self.startup()
         self.webTime = WebTime()
-        self.weather = Weather(location)
+        self.weather = Weather(location, server=not cli)
         self.eufy = Eufy(filename=filename)
         self.increment = increment
         self.schedule = {k:datetime.strptime(schedule[k],"%I%p").hour for k in schedule.keys()}
@@ -74,7 +74,15 @@ class Loop():
                 output.append("Eufy Started")
 
             if self.cli == False:
-                self.output.put(output)
+                data = output[0]
+                data["updated"] = output[1]
+
+                try:
+                    data["eufy"] = output[2]
+                except Exception as e:
+                    data["eufy"] = None
+
+                self.output.put(data)
             else:
                 output = "\n".join(output)
                 print(output)
@@ -102,7 +110,7 @@ if __name__ == '__main__':
         def index():
             if not output.empty():
                 app.output_data = output.get()
-            return app.output_data[0]
+            return app.output_data
 
         app.run(host='0.0.0.0')
         p.join()
