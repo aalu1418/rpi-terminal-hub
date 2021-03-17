@@ -18,8 +18,13 @@ Various integrations for controlling / reporting devices and information.
 
 ### Eufy
 `eufy.py`: Integration with IR emitter + receiver to control a Eufy Robovac 15C. The `eufy.json` file can be regenerated as well for other remotes.
-* `pair()`: sequence for recording various buttons on Eufy remote
-* `emit()`: command for emitting specified IR commands. Inputs should be a matching string to the stored commands.
+* `pair()`: Sequence for recording various buttons on Eufy remote
+* `emit()`: Command for emitting specified IR commands. Inputs should be a matching string to the stored commands.
+
+### TTC
+`ttc.py`: Checks TTC (toronto transit system) website for alerts using Regex - only displays alerts for subway and streetcars.
+* `fetch()`: Pull HTML from [TTC alerts site](https://www.ttc.ca/Service_Advisories/all_service_alerts.jsp)
+* `parse()`: Filter the HTML data using Regex into an array of TTC lines with active alerts
 
 ## Notes
 Autorun on RPi using CRON
