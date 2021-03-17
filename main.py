@@ -48,9 +48,10 @@ class Loop():
                 self.runToday = True
 
         # if vacuum is supposed to be run today, check for the correct time
-        if self.runToday == True and hour == self.schedule[weekday] and minute < 5:
-            self.runToday = False
-            return True
+        if self.runToday == True:
+            if hour == self.schedule[weekday] and minute < 5:
+                self.runToday = False
+                return True
 
         return False
 
