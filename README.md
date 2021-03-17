@@ -38,6 +38,7 @@ IR Receiver + Emitter
 
 Server Inspiration
 * https://shkspr.mobi/blog/2020/02/turn-an-old-ereader-into-an-information-screen-nook-str/
+* Completed Look: ![](./media/NST_display.jpg)
 
 ToDo:
-* Need to fix API request robustness issues
+* TTC module for Toronto transit
