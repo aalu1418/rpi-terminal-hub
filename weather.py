@@ -6,7 +6,7 @@ def clear():
     print("\033c", end="")
 
 class Weather():
-    def __init__(self, location, server):
+    def __init__(self, location, server=False):
         self.location = location
         self.json = json
         self.server = server
@@ -56,15 +56,13 @@ class Weather():
             self.parse()
 
     def parse(self):
+        # extract data from CLI
         self.data = json.dumps(self.data)
         self.data = re.sub(r'u001b\[.*?m', '', self.data)
         self.data = re.sub(r'u[a-zA-Z0-9]{4}', '', self.data)
-        self.data = self.data.replace('\\n', "")
-        self.data = self.data.replace('\\', "")
-        self.data = self.data.replace('+', "")
+        self.data = re.sub(r'[\\+]n{0,1}', '', self.data)
         self.data = re.sub(r'[^a-zA-Z0-9%]{4,} ', "  ", self.data)
         self.data = re.split(r'\s{2,}', self.data[1:-1])
-
         self.data.reverse()
         parsed = {}
 
@@ -78,10 +76,11 @@ class Weather():
 
         # current weather
         key = self.data.pop()
+        params = ["condition", "temp", "wind", "visibility", "precip"]
         if "Weather report:" in key:
             key = "current"
         parsed[key] = {}
-        for k in ["condition", "temp", "wind", "visibility", "precip"]:
+        for k in params:
             if k == "temp":
                 parsed[key][k] = split(self.data.pop())
             else:
@@ -94,7 +93,7 @@ class Weather():
             p = {}
             p["day"] = day
 
-            for j in [None, "condition", "temp", "wind", "visibility", "precip"]:
+            for j in [None]+params:
                 for k in ['Morning', 'Noon', 'Evening', 'Night']:
                     if j == None:
                         time = self.data.pop()
