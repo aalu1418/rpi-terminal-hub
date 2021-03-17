@@ -1,21 +1,21 @@
-from eufy import Eufy
+# from eufy import Eufy
 from weather import Weather, clear
 from webTime import WebTime
 from time import time, sleep
 import os
 from datetime import datetime
 import sys
-from flask import Flask
+from flask import Flask, render_template
 app = Flask(__name__)
 app.output_data = ["Hello, World"] # storing data for output
 
 # ------ MAIN LOOP ------------
 class Loop():
     def __init__(self, schedule={}, cli=True, output=None, location='Toronto', filename='/home/pi/rpi-terminal-hub/eufy.json', increment=15, autorun=True):
-        self.startup()
+        # self.startup()
         self.webTime = WebTime()
         self.weather = Weather(location, server=not cli)
-        self.eufy = Eufy(filename=filename)
+        # self.eufy = Eufy(filename=filename)
         self.increment = increment
         self.schedule = {k:datetime.strptime(schedule[k],"%I%p").hour for k in schedule.keys()}
         self.runToday = False
@@ -115,7 +115,8 @@ if __name__ == '__main__':
         def index():
             if not output.empty():
                 app.output_data = output.get()
-            return app.output_data
+            # return app.output_data
+            return render_template('index.html', data=app.output_data)
 
         app.run(host='0.0.0.0')
         p.join()

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <title>RPi Hub</title>
+    <style type="text/css">
+      body {
+        font-family: monospace;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      th {
+        font-size: 15rem;
+        font-weight: bold;
+        padding: 7px;
+      }
+      td {
+        font-size: 2em;
+        padding: 7px;
+      }
+      .forecast {
+        border: 5px solid #555;
+        width: 25%;
+        font-size: 1.5rem;
+      }
+      .small {
+        font-size: 1rem;
+      }
+    </style>
+  </head>
+  <body style="width: 580px; height: 800px;">
+    <table>
+      <tr>
+        <th rowspan="4">
+          {{data.current.temp.real}}<span style="font-size: 25%">&#176;{{data.current.temp.unit}}</span>
+        </th>
+        <td>{{data.current.condition}}</td>
+      </tr>
+      <tr>
+        <td>Feels like:<br>{{data.current.temp.feel}} &#176;{{data.current.temp.unit}}</td>
+      </tr>
+      <tr>
+        <td>Wind:<br>{{data.current.wind}}</td>
+      </tr>
+      <tr>
+        <td>Precip:<br>{{data.current.precip}}</td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <th style="font-size: 4rem">{{data.forecast[0].day}}</td>
+      </tr>
+    </table>
+    <table >
+      <tr>
+        <td class="forecast">Morning</td>
+        <td class="forecast">Noon</td>
+        <td class="forecast">Evening</td>
+        <td class="forecast">Night</td>
+      </tr>
+      <tr>
+        <td class="forecast small">{{data.forecast[0].Morning.condition}}</td>
+        <td class="forecast small">{{data.forecast[0].Noon.condition}}</td>
+        <td class="forecast small">{{data.forecast[0].Evening.condition}}</td>
+        <td class="forecast small">{{data.forecast[0].Night.condition}}</td>
+      </tr>
+      <tr>
+        <td class="forecast small">{{data.forecast[0].Morning.temp.real}}({{data.forecast[0].Morning.temp.feel}}) &#176;{{data.current.temp.unit}}</td>
+        <td class="forecast small">{{data.forecast[0].Noon.temp.real}}({{data.forecast[0].Noon.temp.feel}}) &#176;{{data.current.temp.unit}}</td>
+        <td class="forecast small">{{data.forecast[0].Evening.temp.real}}({{data.forecast[0].Evening.temp.feel}}) &#176;{{data.current.temp.unit}}</td>
+        <td class="forecast small">{{data.forecast[0].Night.temp.real}}({{data.forecast[0].Night.temp.feel}}) &#176;{{data.current.temp.unit}}</td>
+      </tr>
+      <tr>
+        <td class="forecast small">{{data.forecast[0].Morning.precip}}</td>
+        <td class="forecast small">{{data.forecast[0].Noon.precip}}</td>
+        <td class="forecast small">{{data.forecast[0].Evening.precip}}</td>
+        <td class="forecast small">{{data.forecast[0].Night.precip}}</td>
+      </tr>
+      <tr>
+        <td class="forecast small">{{data.forecast[0].Morning.wind}}</td>
+        <td class="forecast small">{{data.forecast[0].Noon.wind}}</td>
+        <td class="forecast small">{{data.forecast[0].Evening.wind}}</td>
+        <td class="forecast small">{{data.forecast[0].Night.wind}}</td>
+      </tr>
+    </table>
+
+    Eufy Running? {{data.eufy}}
+    <br>
+    {{data.location}}
+    <br>
+    {{data.updated}}
+  </body>
+</html>
