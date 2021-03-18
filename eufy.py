@@ -3,8 +3,14 @@ from ircodec.command import CommandSet
 import sys
 from time import sleep
 
+states = {0: None,
+          1: "Scheduled",
+          2: "Started",
+          3: "Completed"}
+
 class Eufy:
     def __init__(self, filename=None, emitter=None, receiver=None):
+        self.status = 0
         if filename is not None:
             self.controller = CommandSet.load(filename)
         elif emitter is not None and receiver is not None:
@@ -22,7 +28,13 @@ class Eufy:
         self.controller.save_as('eufy.json')
 
     def emit(self, v):
+        if v == 'start_stop':
+            self.status = 2
         self.controller.emit(v)
+
+    def print(self):
+        return states[self.status]
+
 
 if __name__ == '__main__':
     if '--pair' in sys.argv:

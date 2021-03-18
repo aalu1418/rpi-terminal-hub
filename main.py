@@ -1,7 +1,7 @@
 # custom modules
 from webTime import WebTime
 from weather import Weather, clear
-# from eufy import Eufy
+from eufy import Eufy
 from ttc import TTC
 
 # public modules
@@ -18,15 +18,14 @@ app.output_data = "Hello, World" # storing data for output
 # ------ MAIN LOOP ------------
 class Loop():
     def __init__(self, schedule={}, cli=True, output=None, location='Toronto', filename='/home/pi/rpi-terminal-hub/eufy.json', increment=15, autorun=True):
-        # self.startup()
+        self.startup()
         self.webTime = WebTime()
         self.weather = Weather(location, server=not cli)
-        # self.eufy = Eufy(filename=filename)
+        self.eufy = Eufy(filename=filename)
         self.ttc = TTC()
 
         self.increment = increment
         self.schedule = {k:datetime.strptime(schedule[k],"%I%p").hour for k in schedule.keys()}
-        self.runToday = False
         self.cli = cli
         self.output = output
         self.start = True
@@ -52,14 +51,20 @@ class Loop():
 
         # check at midnight if vacuum is supposed to be run today (or on startup)
         if (hour == 0 and minute < 5) or self.start:
+            self.eufy.status = 0 # reset status
             if weekday in self.schedule.keys():
-                self.runToday = True
+                self.eufy.status = 1
 
         # if vacuum is supposed to be run today, check for the correct time
-        if self.runToday == True:
+        if self.eufy.status == 1:
             if hour == self.schedule[weekday] and minute < 5:
-                self.runToday = False
+                self.eufy.status = 2
+                self.time = time()
                 return True
+
+        # if vacuum is running, after one hour mark as complete
+        if self.eufy.status == 2 and time()-self.time > 60*60:
+            self.eufy.status = 3
 
         return False
 
@@ -77,25 +82,19 @@ class Loop():
                 continue #retry fetch
 
             output.append(self.weather.data)
-            output.append(f"Last updated: {self.webTime.timestamp}")
-            output.append(", ".join(self.ttc.data))
+            output.append(f"Last Updated: {self.webTime.timestamp}")
+            output.append(f"TTC Alerts: {', '.join(self.ttc.data) or None}")
 
             # scheduled tasks
             if self.scheduler():
                 self.eufy.emit('start_stop')
-                output.append("Eufy Started")
+            output.append(f"Eufy Status: {self.eufy.print()}")
 
             if self.cli == False:
                 data = output[0]
                 data["updated"] = output[1]
                 data["ttc"] = output[2] or None
-
-                try:
-                    data["eufy"] = output[3]
-                    data["eufy"] = "Yes"
-                except Exception as e:
-                    data["eufy"] = "No"
-
+                data["eufy"] = output[3]
                 self.output.put(data)
             else:
                 output = "\n".join(output)
