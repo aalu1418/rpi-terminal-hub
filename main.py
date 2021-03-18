@@ -69,7 +69,6 @@ class Loop():
         return False
 
     def loop(self):
-        clear() #clear loaded data
         while True:
             output = []
 
@@ -97,6 +96,7 @@ class Loop():
                 data["eufy"] = output[3]
                 self.output.put(data)
             else:
+                clear() #clear loaded data
                 output = "\n".join(output)
                 print(output)
 
@@ -107,7 +107,6 @@ class Loop():
             # pause until next interval
             self.delayCalc()
             sleep(self.delay)
-            clear()
 
 if __name__ == '__main__':
     cli = True

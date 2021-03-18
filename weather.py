@@ -62,9 +62,17 @@ class Weather():
         self.data = re.sub(r'u[a-zA-Z0-9]{4}', '', self.data)
         self.data = re.sub(r'[\\+]n{0,1}', '', self.data)
         self.data = re.sub(r'[^a-zA-Z0-9%]{4,} ', "  ", self.data)
+
+        # figure out the unit
+        parsed = {}
+        for i in ["km/h", "mph"]:
+            if i in self.data:
+                self.data = self.data.replace(i, "")
+                parsed = {"w_unit": i}
+                break
+
         self.data = re.split(r'\s{2,}', self.data[1:-1])
         self.data.reverse()
-        parsed = {}
 
         # regex split temp + feels like
         def split(t):
@@ -72,7 +80,8 @@ class Weather():
             feel = t[1]
             if len(t) == 2:
                 feel = t[0]
-            return {"real": t[0], "feel": feel, "unit": t[-1]}
+            parsed["t_unit"] = t[-1]
+            return {"real": t[0], "feel": feel}
 
         # current weather
         key = self.data.pop()

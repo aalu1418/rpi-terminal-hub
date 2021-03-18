@@ -6,6 +6,7 @@
     <style type="text/css">
       body {
         font-family: monospace;
+        word-break: keep-all;
       }
       table {
         border-collapse: collapse;
@@ -36,15 +37,15 @@
     <table>
       <tr>
         <th rowspan="4">
-          {{data.current.temp.real}}<span style="font-size: 25%">&#176;{{data.current.temp.unit}}</span>
+          {{data.current.temp.real}}<span style="font-size: 25%">&#176;{{data.t_unit}}</span>
         </th>
         <td>{{data.current.condition}}</td>
       </tr>
       <tr>
-        <td>Feels like:<br>{{data.current.temp.feel}}&#176;{{data.current.temp.unit}}</td>
+        <td>Feels like:<br>{{data.current.temp.feel}}&#176;{{data.t_unit}}</td>
       </tr>
       <tr>
-        <td>Wind:<br>{{data.current.wind}}</td>
+        <td>Wind:<br>{{data.current.wind}} {{data.w_unit}}</td>
       </tr>
       <tr>
         <td>Precip:<br>{{data.current.precip}}</td>
@@ -63,10 +64,10 @@
         <th class="forecast">Night</th>
       </tr>
       <tr>
-        <td class="forecast">{{data.forecast[0].Morning.temp.real}}({{data.forecast[0].Morning.temp.feel}})&#176;{{data.current.temp.unit}}</td>
-        <td class="forecast">{{data.forecast[0].Noon.temp.real}}({{data.forecast[0].Noon.temp.feel}})&#176;{{data.current.temp.unit}}</td>
-        <td class="forecast">{{data.forecast[0].Evening.temp.real}}({{data.forecast[0].Evening.temp.feel}})&#176;{{data.current.temp.unit}}</td>
-        <td class="forecast">{{data.forecast[0].Night.temp.real}}({{data.forecast[0].Night.temp.feel}})&#176;{{data.current.temp.unit}}</td>
+        <td class="forecast">{{data.forecast[0].Morning.temp.real}}({{data.forecast[0].Morning.temp.feel}})&#176;{{data.t_unit}}</td>
+        <td class="forecast">{{data.forecast[0].Noon.temp.real}}({{data.forecast[0].Noon.temp.feel}})&#176;{{data.t_unit}}</td>
+        <td class="forecast">{{data.forecast[0].Evening.temp.real}}({{data.forecast[0].Evening.temp.feel}})&#176;{{data.t_unit}}</td>
+        <td class="forecast">{{data.forecast[0].Night.temp.real}}({{data.forecast[0].Night.temp.feel}})&#176;{{data.t_unit}}</td>
       </tr>
       <tr>
         <td class="forecast small">{{data.forecast[0].Morning.condition}}</td>
@@ -81,10 +82,10 @@
         <td class="forecast small">{{data.forecast[0].Night.precip}}</td>
       </tr>
       <tr>
-        <td class="forecast small">{{data.forecast[0].Morning.wind}}</td>
-        <td class="forecast small">{{data.forecast[0].Noon.wind}}</td>
-        <td class="forecast small">{{data.forecast[0].Evening.wind}}</td>
-        <td class="forecast small">{{data.forecast[0].Night.wind}}</td>
+        <td class="forecast small">{{data.forecast[0].Morning.wind}}<br>{{data.w_unit}}</td>
+        <td class="forecast small">{{data.forecast[0].Noon.wind}}<br>{{data.w_unit}}</td>
+        <td class="forecast small">{{data.forecast[0].Evening.wind}}<br>{{data.w_unit}}</td>
+        <td class="forecast small">{{data.forecast[0].Night.wind}}<br>{{data.w_unit}}</td>
       </tr>
     </table>
     {{data.ttc}}
