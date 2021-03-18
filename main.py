@@ -8,7 +8,7 @@ from ttc import TTC
 from time import time, sleep
 import os
 from datetime import datetime
-import sys
+import sys, traceback
 
 # flask server
 from flask import Flask, render_template
@@ -73,8 +73,8 @@ class Loop():
                 self.webTime.fetch()
                 self.ttc.fetch()
             except Exception as e:
-                print(e)
-                return #retry fetch
+                traceback.print_exc()
+                continue #retry fetch
 
             output.append(self.weather.data)
             output.append(f"Last updated: {self.webTime.timestamp}")
