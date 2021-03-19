@@ -17,9 +17,10 @@ class TTC:
 
         # filter  for streetcars + subways
         temp = [v[:6] for v in self.data if "Line" in v] # only pulls `Line #`
-        temp = temp + [v for v in self.data if re.search(r'5[0-9]{2}[a-zA-Z]{0,1}.*', v)]
+        temp = temp + [' '.join(v.split(" ")[0:2]) for v in self.data if re.search(r'5[0-9]{2}[a-zA-Z]{0,1}.*', v)]
         self.data = temp
 
 if __name__ == '__main__':
     ttc = TTC()
     ttc.fetch()
+    print(ttc.data)
