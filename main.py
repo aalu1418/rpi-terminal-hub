@@ -124,7 +124,7 @@ if __name__ == '__main__':
 
         @app.route('/')
         def index():
-            if not output.empty():
+            while not output.empty():
                 app.output_data = output.get()
 
             # return initial string if data is not loaded
