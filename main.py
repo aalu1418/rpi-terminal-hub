@@ -78,6 +78,7 @@ class Loop():
                 self.ttc.fetch()
             except Exception as e:
                 traceback.print_exc()
+                sleep(10) #pause 10 seconds
                 continue #retry fetch
 
             output.append(self.weather.data)
