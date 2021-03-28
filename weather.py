@@ -1,17 +1,24 @@
 import requests, json, time
 from webTime import WebTime
-import re
+import re, os
+from datetime import datetime
 
 def clear():
     print("\033c", end="")
 
 class Weather():
-    def __init__(self, location, server=False):
+    def __init__(self, location, server=False, units='metric'):
         self.location = location
         self.json = json
         self.server = server
+        self.units = units
 
     def fetch(self):
+        if self.server == True:
+            from dotenv import load_dotenv
+            load_dotenv()
+            return self.fetchAPI()
+
         res = requests.get(f"https://wttr.in/{self.location}")
         self.data = res.text.replace("\n\nFollow \033[46m\033[30m@igor_chubin\033[0m for wttr.in updates\n", "")
 
@@ -52,69 +59,67 @@ class Weather():
                 split_header[-1] = arrow[1].join(new) #rejoin
                 self.data = divider.join(split_header)
 
-        if self.server == True:
-            self.parse()
+    def fetchAPI(self):
+        KEY = os.getenv('OWM_KEY')
+        query=f"?q={self.location}&appid={KEY}&units={self.units}"
 
-    def parse(self):
-        # extract data from CLI
-        self.data = json.dumps(self.data)
-        self.data = re.sub(r'u001b\[.*?m', '', self.data)
-        self.data = re.sub(r'u[a-zA-Z0-9]{4}', '', self.data)
-        self.data = re.sub(r'[\\+]n{0,1}', '', self.data)
-        self.data = re.sub(r'[^a-zA-Z0-9%]{4,} ', "  ", self.data)
+        # units
+        if self.units == 'imperial':
+            units = {'temp': 'F',
+                     'precip': 'mm',
+                     'speed': 'mph'}
+        else:
+             units = {'temp': 'C',
+                      'precip': 'mm',
+                      'speed': 'km/h'}
 
-        # figure out the unit
-        parsed = {}
-        for i in ["km/h", "mph"]:
-            if i in self.data:
-                self.data = self.data.replace(i, "")
-                parsed = {"w_unit": i}
-                break
+        self.data = {'units': units}
 
-        self.data = re.split(r'\s{2,}', self.data[1:-1])
-        self.data.reverse()
+        def parse(d):
+            # handle missing precip data
+            for i in ['rain', 'snow']:
+                if i not in d.keys():
+                    d[i] = {'1h': 0, '3h': 0}
 
-        # regex split temp + feels like
-        def split(t):
-            t = re.split(r'[() ]{1,2}', t)
-            feel = t[1]
-            if len(t) == 2:
-                feel = t[0]
-            parsed["t_unit"] = t[-1]
-            return {"real": t[0], "feel": feel}
+            #handle missing wind data
+            if "gust" not in d["wind"].keys():
+                d["wind"]["gust"] = 0
 
-        # current weather
-        key = self.data.pop()
-        params = ["condition", "temp", "wind", "visibility", "precip"]
-        if "Weather report:" in key:
-            key = "current"
-        parsed[key] = {}
-        for k in params:
-            if k == "temp":
-                parsed[key][k] = split(self.data.pop())
-            else:
-                parsed[key][k] = self.data.pop()
+            # adjust wind units
+            factor = 60*60/1000
+            if self.units == 'imperial':
+                factor = 1
 
-        #forecasts
-        parsed['forecast'] = []
-        for i in range(3):
-            day = self.data.pop()
-            p = {}
-            p["day"] = day
+            date = datetime.fromtimestamp(d["dt"])
 
-            for j in [None]+params:
-                for k in ['Morning', 'Noon', 'Evening', 'Night']:
-                    if j == None:
-                        time = self.data.pop()
-                        p[k] = {}
-                    elif j == "temp":
-                        p[k][j] = split(self.data.pop())
-                    else:
-                        p[k][j] = self.data.pop()
+            return {"condition": d["weather"][0]["description"].title(),
+                    "temp": round(d["main"]["temp"]),
+                    "temp_feel": d["main"]["feels_like"],
+                    "temp_feel_round": round(d["main"]["feels_like"]),
+                    "wind": round(d["wind"]["speed"]*factor),
+                    "gust": round(d["wind"]["gust"]*factor),
+                    "precip": sum(d['rain'].values()) + sum(d['snow'].values()),
+                    "dt": date.strftime('%a %d %b'),
+                    "hour": date.strftime('%I:%M %p')
+                    }
 
-            parsed['forecast'].append(p)
-        parsed['location'] = self.data.pop()
-        self.data = parsed
+
+        # fetch current
+        res = requests.get("https://api.openweathermap.org/data/2.5/weather"+query)
+        res = res.json()
+
+        self.data["current"] = parse(res)
+        self.data["location"] = f"Location: {res['name']} [{res['coord']['lat']}, {res['coord']['lon']}]"
+
+        # fetch forecast
+        res = requests.get("https://api.openweathermap.org/data/2.5/forecast"+query)
+        res = res.json()
+        res = res["list"][0:4]
+        forecast = []
+        for i in res:
+            forecast.append(parse(i))
+        self.data["forecast"] = forecast
+
 
 if __name__ == '__main__':
     weather = Weather('Toronto', server=True)

@@ -37,55 +37,55 @@
     <table>
       <tr>
         <th rowspan="4">
-          {{data.current.temp.real}}<span style="font-size: 25%">&#176;{{data.t_unit}}</span>
+          {{data.current.temp}}<span style="font-size: 25%">&#176;{{data.units.temp}}</span>
         </th>
         <td>{{data.current.condition}}</td>
       </tr>
       <tr>
-        <td>Feels like:<br>{{data.current.temp.feel}}&#176;{{data.t_unit}}</td>
+        <td>Feels like:<br>{{data.current.temp_feel}}&#176;{{data.units.temp}}</td>
       </tr>
       <tr>
-        <td>Wind:<br>{{data.current.wind}} {{data.w_unit}}</td>
+        <td>Wind:<br>{{data.current.wind}}-{{data.current.gust}} {{data.units.speed}}</td>
       </tr>
       <tr>
-        <td>Precip:<br>{{data.current.precip}}</td>
+        <td>Precip:<br>{{data.current.precip}} {{data.units.precip}}</td>
       </tr>
     </table>
     <table>
       <tr>
-        <th style="font-size: 4rem">{{data.forecast[0].day}}</td>
+        <th style="font-size: 4rem">{{data.current.dt}}</td>
       </tr>
     </table>
     <table >
       <tr>
-        <th class="forecast">Morning</th>
-        <th class="forecast">Noon</th>
-        <th class="forecast">Evening</th>
-        <th class="forecast">Night</th>
+        <th class="forecast">{{data.forecast[0].hour}}</th>
+        <th class="forecast">{{data.forecast[1].hour}}</th>
+        <th class="forecast">{{data.forecast[2].hour}}</th>
+        <th class="forecast">{{data.forecast[3].hour}}</th>
       </tr>
       <tr>
-        <td class="forecast">{{data.forecast[0].Morning.temp.real}}({{data.forecast[0].Morning.temp.feel}})&#176;{{data.t_unit}}</td>
-        <td class="forecast">{{data.forecast[0].Noon.temp.real}}({{data.forecast[0].Noon.temp.feel}})&#176;{{data.t_unit}}</td>
-        <td class="forecast">{{data.forecast[0].Evening.temp.real}}({{data.forecast[0].Evening.temp.feel}})&#176;{{data.t_unit}}</td>
-        <td class="forecast">{{data.forecast[0].Night.temp.real}}({{data.forecast[0].Night.temp.feel}})&#176;{{data.t_unit}}</td>
+        <td class="forecast">{{data.forecast[0].temp}}({{data.forecast[0].temp_feel_round}})&#176;{{data.units.temp}}</td>
+        <td class="forecast">{{data.forecast[1].temp}}({{data.forecast[1].temp_feel_round}})&#176;{{data.units.temp}}</td>
+        <td class="forecast">{{data.forecast[2].temp}}({{data.forecast[2].temp_feel_round}})&#176;{{data.units.temp}}</td>
+        <td class="forecast">{{data.forecast[3].temp}}({{data.forecast[3].temp_feel_round}})&#176;{{data.units.temp}}</td>
       </tr>
       <tr>
-        <td class="forecast small">{{data.forecast[0].Morning.condition}}</td>
-        <td class="forecast small">{{data.forecast[0].Noon.condition}}</td>
-        <td class="forecast small">{{data.forecast[0].Evening.condition}}</td>
-        <td class="forecast small">{{data.forecast[0].Night.condition}}</td>
+        <td class="forecast small">{{data.forecast[0].condition}}</td>
+        <td class="forecast small">{{data.forecast[1].condition}}</td>
+        <td class="forecast small">{{data.forecast[2].condition}}</td>
+        <td class="forecast small">{{data.forecast[3].condition}}</td>
       </tr>
       <tr>
-        <td class="forecast small">{{data.forecast[0].Morning.precip}}</td>
-        <td class="forecast small">{{data.forecast[0].Noon.precip}}</td>
-        <td class="forecast small">{{data.forecast[0].Evening.precip}}</td>
-        <td class="forecast small">{{data.forecast[0].Night.precip}}</td>
+        <td class="forecast small">{{data.forecast[0].precip}} {{data.units.precip}}</td>
+        <td class="forecast small">{{data.forecast[1].precip}} {{data.units.precip}}</td>
+        <td class="forecast small">{{data.forecast[2].precip}} {{data.units.precip}}</td>
+        <td class="forecast small">{{data.forecast[3].precip}} {{data.units.precip}}</td>
       </tr>
       <tr>
-        <td class="forecast small">{{data.forecast[0].Morning.wind}}<br>{{data.w_unit}}</td>
-        <td class="forecast small">{{data.forecast[0].Noon.wind}}<br>{{data.w_unit}}</td>
-        <td class="forecast small">{{data.forecast[0].Evening.wind}}<br>{{data.w_unit}}</td>
-        <td class="forecast small">{{data.forecast[0].Night.wind}}<br>{{data.w_unit}}</td>
+        <td class="forecast small">{{data.forecast[0].wind}} {{data.units.speed}}</td>
+        <td class="forecast small">{{data.forecast[1].wind}} {{data.units.speed}}</td>
+        <td class="forecast small">{{data.forecast[2].wind}} {{data.units.speed}}</td>
+        <td class="forecast small">{{data.forecast[3].wind}} {{data.units.speed}}</td>
       </tr>
     </table>
     {{data.ttc}}

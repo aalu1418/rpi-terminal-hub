@@ -15,6 +15,10 @@ Various integrations for controlling / reporting devices and information.
 `weather.py`: Fetches weather based on submitted location, and returns it via command line. Characters are corrected for proper display on RPi CLI. Takes a `location [string]` and `server [bool]` parameter
 * `fetch()`: Pulls from [wttr.in](wttr.in) and formats the data string into a compatible CLI for Raspberry Pi
 * `parse()`: Converts the CLI output to a struct/dictionary using Regex and data sorting.
+* `fetchAPI()`: Pulls from OpenWeatherMap and returns struct for the server page. Requires a `.env` file with the contents:
+```
+OWM_KEY=<insert api key here>
+```
 
 ### Eufy
 `eufy.py`: Integration with IR emitter + receiver to control a Eufy Robovac 15C. The `eufy.json` file can be regenerated as well for other remotes.
