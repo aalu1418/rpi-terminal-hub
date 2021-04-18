@@ -81,6 +81,10 @@ class Weather():
                 if i not in d.keys():
                     d[i] = {'1h': 0, '3h': 0}
 
+            # handle missing probability of precipitation in current weather
+            if "pop" not in d.keys():
+                d["pop"] = 0
+
             #handle missing wind data
             if "gust" not in d["wind"].keys():
                 d["wind"]["gust"] = 0
@@ -100,7 +104,8 @@ class Weather():
                     "gust": round(d["wind"]["gust"]*factor),
                     "precip": sum(d['rain'].values()) + sum(d['snow'].values()),
                     "dt": date.strftime('%a %d %b'),
-                    "hour": date.strftime('%I:%M %p')
+                    "hour": date.strftime('%I:%M %p'),
+                    "precip_percent": round(d["pop"]*100)
                     }
 
 
