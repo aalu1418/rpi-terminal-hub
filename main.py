@@ -135,6 +135,18 @@ if __name__ == '__main__':
             # return app.output_data
             return render_template('index.html', data=app.output_data)
 
+        #  allow remote triggering of vacuum
+        @app.route('/vacuum', methods=['POST'])
+        def vacuum():
+            eufy = Eufy(filename='/home/pi/rpi-terminal-hub/eufy.json')
+            eufy.emit('start_stop')
+
+        # allow remote pull to update code
+        @app.route('/pull', methods=['POST'])
+        def pull():
+            os.system('cd /home/pi/rpi-terminal-hub')
+            os.system('git pull && sudo reboot')
+
         app.run(host='0.0.0.0')
         p.join()
 

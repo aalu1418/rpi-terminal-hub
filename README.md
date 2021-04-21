@@ -45,9 +45,13 @@ IR Receiver + Emitter
 * (Circult) https://www.hackster.io/austin-stanton/creating-a-raspberry-pi-universal-remote-with-lirc-2fd581
 * (Python Package) https://github.com/kentwait/ircodec
 
+RPi Timezones
+* https://raspberrypi.stackexchange.com/questions/87164/setting-timezone-non-interactively
+
 Server Inspiration
 * https://shkspr.mobi/blog/2020/02/turn-an-old-ereader-into-an-information-screen-nook-str/
 * Completed Look: ![](./media/NST_display.jpg)
 
-ToDo:
-* TTC module for Toronto transit
+To Do:
+* Bash script for installing everything
+* Post endpoint for triggering vacuum, and pulling new repo changes
