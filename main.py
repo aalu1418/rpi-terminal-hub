@@ -22,7 +22,7 @@ log.setLevel(logging.ERROR)
 
 # ------ MAIN LOOP ------------
 class Loop():
-    def __init__(self, schedule={}, cli=True, output=None, location='Toronto', filename='/home/pi/rpi-terminal-hub/eufy.json', increment=15, autorun=True):
+    def __init__(self, schedule={}, cli=True, output=None, location='Toronto', filename='~/rpi-terminal-hub/eufy.json', increment=15, autorun=True):
         self.startup()
         self.webTime = WebTime()
         self.weather = Weather(location, server=not cli)
@@ -143,13 +143,13 @@ if __name__ == '__main__':
         #  allow remote triggering of vacuum
         @app.route('/vacuum', methods=['POST'])
         def vacuum():
-            eufy = Eufy(filename='/home/pi/rpi-terminal-hub/eufy.json')
+            eufy = Eufy(filename='~/rpi-terminal-hub/eufy.json')
             eufy.emit('start_stop')
 
         # allow remote pull to update code
         @app.route('/pull', methods=['POST'])
         def pull():
-            os.system('cd /home/pi/rpi-terminal-hub')
+            os.system('cd ~/rpi-terminal-hub')
             os.system('git pull && sudo reboot')
 
         app.run(host='0.0.0.0')

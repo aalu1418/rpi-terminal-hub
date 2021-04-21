@@ -2,7 +2,7 @@
 
 # install packages
 sudo apt-get update
-sudo apt-get install git pip3 pigpio vim
+sudo apt-get install git python3-pip pigpio vim
 
 # install python packages
 pip3 install pigpio ircodec flask requests python-dotenv
@@ -11,4 +11,4 @@ pip3 install pigpio ircodec flask requests python-dotenv
 git pull https://github.com/aalu1418/rpi-terminal-hub
 
 # setup cron job
-crontab -l | { cat; echo "@reboot sleep 60 && /usr/bin/python3 /home/pi/rpi-terminal-hub/main.py --server >> ~/cron.log 2>&1"; } | crontab -
+crontab -l | { cat; echo "@reboot sleep 60 && /usr/bin/python3 ~/rpi-terminal-hub/main.py --server >> ~/cron.log 2>&1"; } | crontab -
