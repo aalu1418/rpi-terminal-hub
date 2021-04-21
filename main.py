@@ -15,6 +15,11 @@ from flask import Flask, render_template
 app = Flask(__name__)
 app.output_data = "Hello, World" # storing data for output
 
+# disable request logging
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+
 # ------ MAIN LOOP ------------
 class Loop():
     def __init__(self, schedule={}, cli=True, output=None, location='Toronto', filename='/home/pi/rpi-terminal-hub/eufy.json', increment=15, autorun=True):
