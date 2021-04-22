@@ -2,7 +2,7 @@
 
 # install packages
 sudo apt-get update
-sudo apt-get install git python3-pip pigpio vim
+sudo apt-get install -y git python3-pip pigpio vim
 
 # install python packages
 pip3 install pigpio ircodec flask requests python-dotenv
