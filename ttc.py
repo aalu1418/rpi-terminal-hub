@@ -2,10 +2,11 @@ import requests, re
 
 class TTC:
     def __init__(self):
-        self.url = "https://www.ttc.ca/Service_Advisories/all_service_alerts.jsp"
+        self.url = "http://www.ttc.ca/Service_Advisories/all_service_alerts.jsp"
 
     def fetch(self):
-        res = requests.get(self.url)
+        headers = {'user-agent': 'Mozilla/5.0'} #https://stackoverflow.com/questions/35525424/file-get-contents-failed-to-open-stream-http-request-failed-http-1-1-463
+        res = requests.get(self.url, headers=headers)
         self.data = res.text
         self.parse()
 
