@@ -146,11 +146,11 @@ if __name__ == '__main__':
             eufy = Eufy(filename='/home/pi/rpi-terminal-hub/eufy.json')
             eufy.emit('start_stop')
 
-        # allow remote pull to update code
-        @app.route('/pull', methods=['POST'])
-        def pull():
-            os.system('cd /home/pi/rpi-terminal-hub')
-            os.system('git pull && sudo reboot')
+        ## allow remote pull to update code
+        # @app.route('/pull', methods=['POST'])
+        # def pull():
+        #    os.system('cd /home/pi/rpi-terminal-hub')
+        #    os.system('git pull && sudo reboot')
 
         app.run(host='0.0.0.0')
         p.join()
