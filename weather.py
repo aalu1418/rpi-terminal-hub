@@ -86,7 +86,7 @@ class Weather():
                 d["pop"] = 0
 
             #handle missing wind data
-            if "gust" not in d["wind"].keys():
+            if "wind" in d.keys() and "gust" not in d["wind"].keys():
                 d["wind"]["gust"] = 0
 
             # adjust wind units

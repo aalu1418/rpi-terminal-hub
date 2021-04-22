@@ -16,9 +16,9 @@ app = Flask(__name__)
 app.output_data = "Hello, World" # storing data for output
 
 # disable request logging
-import logging
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+# import logging
+# log = logging.getLogger('werkzeug')
+# log.setLevel(logging.ERROR)
 
 # ------ MAIN LOOP ------------
 class Loop():
