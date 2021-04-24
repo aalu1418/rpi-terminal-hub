@@ -145,6 +145,7 @@ if __name__ == '__main__':
         def vacuum():
             eufy = Eufy(filename='/home/pi/rpi-terminal-hub/eufy.json')
             eufy.emit('start_stop')
+            return {'status': 200}
 
         ## allow remote pull to update code
         # @app.route('/pull', methods=['POST'])
