@@ -30,6 +30,19 @@ OWM_KEY=<insert api key here>
 * `fetch()`: Pull HTML from [TTC alerts site](https://www.ttc.ca/Service_Advisories/all_service_alerts.jsp)
 * `parse()`: Filter the HTML data using Regex into an array of TTC lines with active alerts
 
+## Web Server
+Endpoint: `GET /`
+* Main endpoint for webpage with all information
+
+Endpoint: `POST /vacuum`
+* Example curl request: `curl -X POST -d "cmd=start" localhost:5000/vacuum`
+* Missing `data` will default to `start_stop`
+* Potential commands: `start_stop`, `home`, `circle`, `edge`, `auto`
+
+Endpoint: `POST /pull`
+* Runs `git pull` on the repository on remote server
+* Example curl request: `curl -X POST localhost:5000/pull`
+
 ## Notes
 Autorun on RPi using CRON
 * https://phoenixnap.com/kb/crontab-reboot

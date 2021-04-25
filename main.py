@@ -11,7 +11,7 @@ from datetime import datetime
 import sys, traceback
 
 # flask server
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 app = Flask(__name__)
 app.output_data = "Hello, World" # storing data for output
 
@@ -144,14 +144,18 @@ if __name__ == '__main__':
         @app.route('/vacuum', methods=['POST'])
         def vacuum():
             eufy = Eufy(filename='/home/pi/rpi-terminal-hub/eufy.json')
-            eufy.emit('start_stop')
-            return {'status': 200}
+            cmd = request.form.get('cmd').lower()
+            if (cmd == 'start' or cmd == 'stop' or cmd not in eufy.commands):
+                cmd = 'start_stop'
 
-        ## allow remote pull to update code
-        # @app.route('/pull', methods=['POST'])
-        # def pull():
-        #    os.system('cd /home/pi/rpi-terminal-hub')
-        #    os.system('git pull && sudo reboot')
+            eufy.emit(cmd)
+            return {'status': 'called '+cmd}
+
+        # allow remote pull to update code
+        @app.route('/pull', methods=['POST'])
+        def pull():
+           out = os.system('cd /home/pi/rpi-terminal-hub && git pull')
+           return {'status': 'ready for reboot'}
 
         app.run(host='0.0.0.0')
         p.join()

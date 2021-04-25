@@ -11,6 +11,7 @@ states = {0: None,
 class Eufy:
     def __init__(self, filename=None, emitter=None, receiver=None):
         self.status = 0
+        self.commands = ['start_stop', 'home', 'circle', 'edge', 'auto']
         if filename is not None:
             self.controller = CommandSet.load(filename)
         elif emitter is not None and receiver is not None:
@@ -19,8 +20,7 @@ class Eufy:
             raise
 
     def pair(self):
-        commands = ['start_stop', 'home', 'circle', 'edge', 'auto']
-        for c in commands:
+        for c in self.commands:
             print('PAIR: ', c)
             self.controller.add(c)
             sleep(1)
