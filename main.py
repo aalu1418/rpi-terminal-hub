@@ -171,7 +171,7 @@ if __name__ == '__main__':
         # allow reboot
         @app.route('/reboot', methods=['POST'])
         def reboot():
-            subprocess.Popen('sleep 10 && sudo reboot')
+            subprocess.Popen('sleep 10 && sudo reboot', shell=True)
             return {'status': 'rebooting in 10 seconds'}
 
 
