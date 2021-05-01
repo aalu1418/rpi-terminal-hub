@@ -50,26 +50,30 @@ class Loop():
 
     # track schedule and see if task needs to be run
     def scheduler(self):
-        weekday = self.webTime.weekday
-        hour = self.webTime.raw.hour
-        minute = self.webTime.raw.minute
+        try:
+            weekday = self.webTime.weekday
+            hour = self.webTime.raw.hour
+            minute = self.webTime.raw.minute
 
-        # check at midnight if vacuum is supposed to be run today (or on startup)
-        if (hour == 0 and minute < 5) or self.start:
-            self.eufy.status = 0 # reset status
-            if weekday in self.schedule.keys():
-                self.eufy.status = 1
+            # check at midnight if vacuum is supposed to be run today (or on startup)
+            if (hour == 0 and minute < 5) or self.start:
+                self.eufy.status = 0 # reset status
+                if weekday in self.schedule.keys():
+                    self.eufy.status = 1
 
-        # if vacuum is supposed to be run today, check for the correct time
-        if self.eufy.status == 1:
-            if hour == self.schedule[weekday] and minute < 5:
-                self.eufy.status = 2
-                self.time = time()
-                return True
+            # if vacuum is supposed to be run today, check for the correct time
+            if self.eufy.status == 1:
+                if hour == self.schedule[weekday] and minute < 5:
+                    self.eufy.status = 2
+                    self.time = time()
+                    return True
 
-        # if vacuum is running, after one hour mark as complete
-        if self.eufy.status == 2 and time()-self.time > 60*60:
-            self.eufy.status = 3
+            # if vacuum is running, after one hour mark as complete
+            if self.eufy.status == 2 and time()-self.time > 60*60:
+                self.eufy.status = 3
+        except Exception as e:
+            self.eufy.status = 0 # reset status on error & log
+            traceback.print_exc()
 
         return False
 
@@ -83,7 +87,7 @@ class Loop():
                 self.ttc.fetch()
             except Exception as e:
                 traceback.print_exc()
-                sleep(10) #pause 10 seconds
+                sleep(30) #pause 30 seconds
                 continue #retry fetch
 
             output.append(self.weather.data)
