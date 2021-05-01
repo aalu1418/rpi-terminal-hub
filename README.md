@@ -43,6 +43,15 @@ Endpoint: `POST /pull`
 * Runs `git pull` on the repository on remote server
 * Example curl request: `curl -X POST localhost:5000/pull`
 
+Endpoint `GET /logs`
+* Returns the `cron.log` file
+* Viewable using http://localhost:5000/logs or `curl -X POST -d "format=cli" localhost:5000/logs`
+* Format can be `web` (default) or `cli`
+
+Endpoint `POST /reboot`
+* Restarts the server
+* Example curl request: `curl -X POST -d "discardLog=True" localhost:5000/reboot`
+
 ## Notes
 Autorun on RPi using CRON
 * https://phoenixnap.com/kb/crontab-reboot

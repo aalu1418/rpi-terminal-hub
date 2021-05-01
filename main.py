@@ -1,7 +1,7 @@
 # custom modules
 from webTime import WebTime
 from weather import Weather, clear
-from eufy import Eufy
+# from eufy import Eufy
 from ttc import TTC
 
 # public modules
@@ -22,10 +22,10 @@ app.output_data = "Hello, World" # storing data for output
 # ------ MAIN LOOP ------------
 class Loop():
     def __init__(self, schedule={}, cli=True, output=None, location='Toronto', filename='/home/pi/rpi-terminal-hub/eufy.json', increment=15, autorun=True):
-        self.startup()
+        # self.startup()
         self.webTime = WebTime()
         self.weather = Weather(location, server=not cli)
-        self.eufy = Eufy(filename=filename)
+        # self.eufy = Eufy(filename=filename)
         self.ttc = TTC()
 
         self.increment = increment
@@ -93,16 +93,16 @@ class Loop():
             output.append(f"Last Updated: {self.webTime.timestamp}")
             output.append(f"TTC Alerts: {', '.join(self.ttc.data) or None}")
 
-            # scheduled tasks
-            if self.scheduler():
-                self.eufy.emit('start_stop')
-            output.append(f"Eufy Status: {self.eufy.print()}")
+            # # scheduled tasks
+            # if self.scheduler():
+            #     self.eufy.emit('start_stop')
+            # output.append(f"Eufy Status: {self.eufy.print()}")
 
             if self.cli == False:
                 data = output[0]
                 data["updated"] = output[1]
                 data["ttc"] = output[2] or None
-                data["eufy"] = output[3]
+                # data["eufy"] = output[3]
                 self.output.put(data)
             else:
                 clear() #clear loaded data
@@ -163,14 +163,23 @@ if __name__ == '__main__':
         # allow remote pull to update code
         @app.route('/logs', methods=['GET'])
         def logs():
-           f = open('/home/pi/cron.log')
-           data = f.read()
-           f.close()
-           return data
+            f = open('/home/pi/cron.log')
+            data = f.read()
+            f.close()
+
+            format = request.form.get('format')
+            if format == None or format.lower() == 'web':
+                data = data.replace('\n', '<br>')
+
+            return data
 
         # allow reboot
         @app.route('/reboot', methods=['POST'])
         def reboot():
+            discardLog = request.form.get('discardLog')
+            if discardLog == "True":
+                os.system('rm /home/pi/cron.log')
+
             subprocess.Popen('sleep 10 && sudo reboot', shell=True)
             return {'status': 'rebooting in 10 seconds'}
 
