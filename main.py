@@ -6,9 +6,8 @@ from ttc import TTC
 
 # public modules
 from time import time, sleep
-import os
 from datetime import datetime
-import sys, traceback
+import os, sys, traceback, subprocess
 
 # flask server
 from flask import Flask, render_template, request
@@ -160,6 +159,21 @@ if __name__ == '__main__':
         def pull():
            out = os.system('cd /home/pi/rpi-terminal-hub && git pull')
            return {'status': 'ready for reboot'}
+
+        # allow remote pull to update code
+        @app.route('/logs', methods=['GET'])
+        def logs():
+           f = open('/home/pi/cron.log')
+           data = f.read()
+           f.close()
+           return data
+
+        # allow reboot
+        @app.route('/reboot', methods=['POST'])
+        def reboot():
+            subprocess.Popen('sleep 10 && sudo reboot')
+            return {'status': 'rebooting in 10 seconds'}
+
 
         app.run(host='0.0.0.0')
         p.join()
