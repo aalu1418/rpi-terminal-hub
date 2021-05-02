@@ -3,6 +3,7 @@ Turning a RPi into a hub using Raspian OS Lite (CLI only).
 
 The `main.py` file contains the primary logic of continuously running the code. It handles updating the weather data (every 15 minutes), and also triggering scheduled events (specifically for the robot vacuum). It outputs data as a CLI display.
 * `--server`: Outputs data as a web page on the local network. Implements the main loop and Flask webpage using the multiprocessing library (`Process` for running the loop, `Queue` for passing information from loop to web server).
+* `--no-eufy`: Useful flag when testing locally where the GPIO libraries are not installed. Skips the eufy related portions in the code.
 
 ## Modules
 Various integrations for controlling / reporting devices and information.

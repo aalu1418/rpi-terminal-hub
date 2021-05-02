@@ -2,7 +2,7 @@
 from src.webTime import WebTime
 from src.weather import Weather, clear
 from src.ttc import TTC
-# from src.eufy import Eufy
+# from src.eufy import Eufy # imported dynamically in the Loop() and '__main__'
 
 # public modules
 from time import time, sleep
@@ -16,11 +16,13 @@ app.output_data = "Hello, World" # storing data for output
 
 # ------ MAIN LOOP ------------
 class Loop():
-    def __init__(self, schedule={}, cli=True, output=None, location='Toronto', filename='/home/pi/rpi-terminal-hub/data/eufy.json', increment=15, autorun=True):
-        # self.startup()
+    def __init__(self, schedule={}, cli=True, output=None, eufy=True, location='Toronto', filename='/home/pi/rpi-terminal-hub/data/eufy.json', increment=15, autorun=True):
+        if eufy:
+            from src.eufy import Eufy
+            self.startup()
+            self.eufy = Eufy(filename=filename)
         self.webTime = WebTime()
         self.weather = Weather(location, server=not cli)
-        # self.eufy = Eufy(filename=filename)
         self.ttc = TTC()
 
         self.increment = increment
@@ -88,16 +90,16 @@ class Loop():
             output.append(f"Last Updated: {self.webTime.timestamp}")
             output.append(f"TTC Alerts: {', '.join(self.ttc.data) or None}")
 
-            # # scheduled tasks
-            # if self.scheduler():
-            #     self.eufy.emit('start_stop')
-            # output.append(f"Eufy Status: {self.eufy.print()}")
+            # scheduled tasks
+            if hasattr(self, 'eufy') and self.scheduler():
+                self.eufy.emit('start_stop')
+            output.append(f"Eufy Status: {self.eufy.print() if hasattr(self, 'eufy') else 'N/A'}")
 
             if self.cli == False:
                 data = output[0]
                 data["updated"] = output[1]
                 data["ttc"] = output[2] or None
-                # data["eufy"] = output[3]
+                data["eufy"] = output[3]
                 self.output.put(data)
             else:
                 clear() #clear loaded data
@@ -118,12 +120,17 @@ if __name__ == '__main__':
                 "Thursday": "6PM",
                 "Saturday": "1PM"}
 
+    eufy = False
+    if "--no-eufy" not in sys.argv:
+        from src.eufy import Eufy
+        eufy = True
+
     # requires multiprocessing to run Flask server + loop
     if "--server" in sys.argv:
         from multiprocessing import Process, Queue
         output = Queue()
         cli = False
-        p = Process(target=Loop, args=(schedule, cli, output))
+        p = Process(target=Loop, args=(schedule, cli, output, eufy))
         p.start()
 
         @app.route('/')
@@ -141,13 +148,15 @@ if __name__ == '__main__':
         #  allow remote triggering of vacuum
         @app.route('/vacuum', methods=['POST'])
         def vacuum():
-            eufy = Eufy(filename='/home/pi/rpi-terminal-hub/data/eufy.json')
-            cmd = request.form.get('cmd').lower()
-            if (cmd == 'start' or cmd == 'stop' or cmd not in eufy.commands):
-                cmd = 'start_stop'
+            if eufy:
+                eufy = Eufy(filename='/home/pi/rpi-terminal-hub/data/eufy.json')
+                cmd = request.form.get('cmd').lower()
+                if (cmd == 'start' or cmd == 'stop' or cmd not in eufy.commands):
+                    cmd = 'start_stop'
 
-            eufy.emit(cmd)
-            return {'status': 'called '+cmd}
+                eufy.emit(cmd)
+                return {'status': 'called '+cmd}
+            return {'status': 'eufy not enabled'}
 
         # allow remote pull to update code
         @app.route('/pull', methods=['POST'])
