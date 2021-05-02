@@ -149,12 +149,12 @@ if __name__ == '__main__':
         @app.route('/vacuum', methods=['POST'])
         def vacuum():
             if eufy:
-                eufy = Eufy(filename='/home/pi/rpi-terminal-hub/data/eufy.json')
+                eufyInterface = Eufy(filename='/home/pi/rpi-terminal-hub/data/eufy.json')
                 cmd = request.form.get('cmd').lower()
-                if (cmd == 'start' or cmd == 'stop' or cmd not in eufy.commands):
+                if (cmd == 'start' or cmd == 'stop' or cmd not in eufyInterface.commands):
                     cmd = 'start_stop'
 
-                eufy.emit(cmd)
+                eufyInterface.emit(cmd)
                 return {'status': 'called '+cmd}
             return {'status': 'eufy not enabled'}
 
