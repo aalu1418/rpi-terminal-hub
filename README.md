@@ -73,7 +73,3 @@ RPi Timezones
 Server Inspiration
 * https://shkspr.mobi/blog/2020/02/turn-an-old-ereader-into-an-information-screen-nook-str/
 * Completed Look: ![](./media/NST_display.jpg)
-
-To Do:
-* Bash script for installing everything
-* Post endpoint for triggering vacuum, and pulling new repo changes

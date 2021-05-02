@@ -1,5 +1,4 @@
 import requests, json, time
-from webTime import WebTime
 import re, os
 from datetime import datetime
 
@@ -102,7 +101,7 @@ class Weather():
                     "temp_feel_round": round(d["main"]["feels_like"]),
                     "wind": round(d["wind"]["speed"]*factor),
                     "gust": round(d["wind"]["gust"]*factor),
-                    "precip": sum(d['rain'].values()) + sum(d['snow'].values()),
+                    "precip": round(sum(d['rain'].values()) + sum(d['snow'].values()), 1),
                     "dt": date.strftime('%a %d %b'),
                     "hour": date.strftime('%I:%M %p'),
                     "precip_percent": round(d["pop"]*100)
@@ -128,12 +127,9 @@ class Weather():
 
 if __name__ == '__main__':
     weather = Weather('Toronto', server=True)
-    webTime = WebTime()
     clear()
     while True:
         weather.fetch()
         print(weather.data)
-        webTime.fetch()
-        print(f"Last updated: {webTime.timestamp}")
         time.sleep(15*60)
         clear()

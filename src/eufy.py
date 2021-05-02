@@ -41,5 +41,5 @@ if __name__ == '__main__':
         eufy = Eufy(emitter=27, receiver=17)
         eufy.pair()
     else:
-        eufy = Eufy(filename='eufy.json')
+        eufy = Eufy(filename='../data/eufy.json')
         eufy.emit('start_stop')
