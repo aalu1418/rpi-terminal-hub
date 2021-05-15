@@ -37,7 +37,6 @@ class Loop():
     # initialization
     def startup(self):
         os.system("sudo pigpiod")
-        os.system("pip3 install feedparser")
 
     # calculate seconds until next minute interval (aligned with the hour)
     def delayCalc(self):
