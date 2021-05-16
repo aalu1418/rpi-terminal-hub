@@ -10,7 +10,7 @@ class TTC:
 
 
     def parse(self):
-        self.data = [alert['summary'] for alert in self.data['entries']]
+        self.data = [alert['summary'].replace(':', '') for alert in self.data['entries']]
 
         # filter for streetcars + subways
         temp = [v[:6] for v in self.data if "Line" in v and 'Elevator' not in v] # only pulls `Line #`
