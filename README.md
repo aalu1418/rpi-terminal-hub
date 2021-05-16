@@ -1,5 +1,7 @@
 # Raspberry Pi Terminal Hub
-Turning a RPi into a hub using Raspian OS Lite (CLI only).
+Turning a RPi into a hub using Raspian OS Lite (CLI or server).
+
+Credits: Icons created by [@erikflowers](https://github.com/erikflowers/weather-iconss)
 
 The `main.py` file contains the primary logic of continuously running the code. It handles updating the weather data (every 15 minutes), and also triggering scheduled events (specifically for the robot vacuum). It outputs data as a CLI display.
 * `--server`: Outputs data as a web page on the local network. Implements the main loop and Flask webpage using the multiprocessing library (`Process` for running the loop, `Queue` for passing information from loop to web server).

@@ -5,6 +5,32 @@ from datetime import datetime
 def clear():
     print("\033c", end="")
 
+iconMappings = {
+    '01d': 'sunny',
+    '01n': 'wi-night-clear',
+    '02': 'cloudy',
+    '03': 'wi-cloud',
+    '04': 'wi-cloudy',
+    '09': 'showers',
+    '10': 'rain',
+    '11': 'thunderstorm',
+    '13': 'snow',
+    '50d': 'fog',
+    '50n': 'wi-night-fog'
+}
+
+def iconMapper(icon):
+    prefix = 'wi'
+    dayNight = 'day' if icon[-1] is 'd' else 'night-alt'
+
+    try:
+        name = iconMappings[icon[:2]]
+    except Exception as e: # if undefined try the whole name
+        name = iconMappings[icon]
+
+    # including the full name acts as an override for autogenerating the name
+    return name if 'wi-' in name else [prefix, dayNight, name].join('-')
+
 class Weather():
     def __init__(self, location, server=False, units='metric'):
         self.location = location
@@ -104,7 +130,8 @@ class Weather():
                     "precip": round(sum(d['rain'].values()) + sum(d['snow'].values()), 1),
                     "dt": date.strftime('%a %d %b'),
                     "hour": date.strftime('%I:%M %p'),
-                    "precip_percent": round(d["pop"]*100)
+                    "precip_percent": round(d["pop"]*100),
+                    "iconPath": iconMapper(d['weather'][0]['icon'])
                     }
 
 
