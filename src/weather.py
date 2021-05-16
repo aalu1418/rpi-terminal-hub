@@ -29,7 +29,7 @@ def iconMapper(icon):
         name = iconMappings[icon]
 
     # including the full name acts as an override for autogenerating the name
-    return name if 'wi-' in name else [prefix, dayNight, name].join('-')
+    return name if 'wi-' in name else '-'.join([prefix, dayNight, name])
 
 class Weather():
     def __init__(self, location, server=False, units='metric'):
