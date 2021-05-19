@@ -8,8 +8,9 @@ def clear():
 iconMappings = {
     '01d': 'sunny',
     '01n': 'wi-night-clear',
-    '02': 'cloudy',
-    '03': 'wi-cloud',
+    '02d': 'sunny-overcast',
+    '02n': 'partly-cloudy',
+    '03': 'cloudy',
     '04': 'wi-cloudy',
     '09': 'showers',
     '10': 'rain',
