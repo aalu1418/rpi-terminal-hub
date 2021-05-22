@@ -14,4 +14,4 @@ pip3 install pigpio ircodec flask requests python-dotenv feedparser
 git clone https://github.com/aalu1418/rpi-terminal-hub
 
 # setup cron job
-crontab -l | { cat; echo "@reboot sleep 60 && /usr/bin/python3 /home/pi/rpi-terminal-hub/main.py --server >> ~/cron.log 2>&1"; } | crontab -
+crontab -l | { cat; echo "@reboot sleep 60 && /usr/bin/python3 /home/pi/rpi-terminal-hub/main.py >> ~/cron.log 2>&1"; } | crontab -

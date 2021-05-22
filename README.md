@@ -1,10 +1,9 @@
 # Raspberry Pi Terminal Hub
-Turning a RPi into a hub using Raspian OS Lite (CLI or server).
+Turning a RPi into a server hub using Raspian OS Lite.
 
 Credits: Icons created by [@erikflowers](https://github.com/erikflowers/weather-iconss)
 
-The `main.py` file contains the primary logic of continuously running the code. It handles updating the weather data (every 15 minutes), and also triggering scheduled events (specifically for the robot vacuum). It outputs data as a CLI display.
-* `--server`: Outputs data as a web page on the local network. Implements the main loop and Flask webpage using the multiprocessing library (`Process` for running the loop, `Queue` for passing information from loop to web server).
+The `main.py` file contains the primary logic of continuously running the code. It handles updating the weather data (every 15 minutes), and also triggering scheduled events (specifically for the robot vacuum). It outputs data as a Flask app at http://0.0.0.0:5000.
 * `--no-eufy`: Useful flag when testing locally where the GPIO libraries are not installed. Skips the eufy related portions in the code.
 
 ## Modules
@@ -15,10 +14,8 @@ Various integrations for controlling / reporting devices and information.
 * `fetch()`: Pulls from time API for the given timezone
 
 ### Weather
-`weather.py`: Fetches weather based on submitted location, and returns it via command line. Characters are corrected for proper display on RPi CLI. Takes a `location [string]` and `server [bool]` parameter
-* `fetch()`: Pulls from [wttr.in](wttr.in) and formats the data string into a compatible CLI for Raspberry Pi
-* `parse()`: Converts the CLI output to a struct/dictionary using Regex and data sorting.
-* `fetchAPI()`: Pulls from OpenWeatherMap and returns struct for the server page. Requires a `.env` file with the contents:
+`weather.py`: Fetches weather based on submitted location, and returns it as a data struct. Takes a `location [string]` parameter
+* `fetch()`: Pulls from OpenWeatherMap and returns struct for the server page. Requires a `.env` file with the contents:
 ```
 OWM_KEY=<insert api key here>
 ```
@@ -65,6 +62,7 @@ Autorun on RPi using CRON
 
 Terminal Weather
 * https://github.com/chubin/wttr.in
+* Used in a previous version (useful for CLI weather app)
 
 IR Receiver + Emitter
 * (Circult) https://www.hackster.io/austin-stanton/creating-a-raspberry-pi-universal-remote-with-lirc-2fd581

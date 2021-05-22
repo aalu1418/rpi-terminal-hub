@@ -8,6 +8,7 @@ from src.ttc import TTC
 from time import time, sleep
 from datetime import datetime
 import os, sys, traceback, subprocess
+from multiprocessing import Process, Queue
 
 # flask server
 from flask import Flask, render_template, request
@@ -16,18 +17,17 @@ app.output_data = "Hello, World" # storing data for output
 
 # ------ MAIN LOOP ------------
 class Loop():
-    def __init__(self, schedule={}, cli=True, output=None, eufy=True, location='Toronto', filename='/home/pi/rpi-terminal-hub/data/eufy.json', increment=15, autorun=True):
+    def __init__(self, schedule={}, output=None, eufy=True, location='Toronto', filename='/home/pi/rpi-terminal-hub/data/eufy.json', increment=15, autorun=True):
         if eufy:
             from src.eufy import Eufy
             self.startup()
             self.eufy = Eufy(filename=filename)
         self.webTime = WebTime()
-        self.weather = Weather(location, server=not cli)
+        self.weather = Weather(location)
         self.ttc = TTC()
 
         self.increment = increment
         self.schedule = {k:datetime.strptime(schedule[k],"%I%p").hour for k in schedule.keys()}
-        self.cli = cli
         self.output = output
         self.start = True
 
@@ -95,16 +95,11 @@ class Loop():
                 self.eufy.emit('start_stop')
             output.append(f"Eufy Status: {self.eufy.print() if hasattr(self, 'eufy') else 'N/A'}")
 
-            if self.cli == False:
-                data = output[0]
-                data["updated"] = output[1]
-                data["ttc"] = output[2] or None
-                data["eufy"] = output[3]
-                self.output.put(data)
-            else:
-                clear() #clear loaded data
-                output = "\n".join(output)
-                print(output)
+            data = output[0]
+            data["updated"] = output[1]
+            data["ttc"] = output[2] or None
+            data["eufy"] = output[3]
+            self.output.put(data)
 
             # clear start up triggers
             if self.start:
@@ -115,7 +110,6 @@ class Loop():
             sleep(self.delay)
 
 if __name__ == '__main__':
-    cli = True
     schedule = {"Tuesday": "6PM",
                 "Thursday": "6PM",
                 "Saturday": "1PM"}
@@ -126,70 +120,64 @@ if __name__ == '__main__':
         eufy = True
 
     # requires multiprocessing to run Flask server + loop
-    if "--server" in sys.argv:
-        from multiprocessing import Process, Queue
-        output = Queue()
-        cli = False
-        p = Process(target=Loop, args=(schedule, cli, output, eufy))
-        p.start()
+    output = Queue()
+    p = Process(target=Loop, args=(schedule, output, eufy))
+    p.start()
 
-        @app.route('/')
-        def index():
-            while not output.empty():
-                app.output_data = output.get()
+    @app.route('/')
+    def index():
+        while not output.empty():
+            app.output_data = output.get()
 
-            # return initial string if data is not loaded
-            if type(app.output_data) is str:
-                return app.output_data
+        # return initial string if data is not loaded
+        if type(app.output_data) is str:
+            return app.output_data
 
-            # return app.output_data
-            return render_template('index.html', data=app.output_data)
+        # return app.output_data
+        return render_template('index.html', data=app.output_data)
 
-        #  allow remote triggering of vacuum
-        @app.route('/vacuum', methods=['POST'])
-        def vacuum():
-            if eufy:
-                eufyInterface = Eufy(filename='/home/pi/rpi-terminal-hub/data/eufy.json')
-                cmd = request.form.get('cmd').lower()
-                if (cmd == 'start' or cmd == 'stop' or cmd not in eufyInterface.commands):
-                    cmd = 'start_stop'
+    #  allow remote triggering of vacuum
+    @app.route('/vacuum', methods=['POST'])
+    def vacuum():
+        if eufy:
+            eufyInterface = Eufy(filename='/home/pi/rpi-terminal-hub/data/eufy.json')
+            cmd = request.form.get('cmd').lower()
+            if (cmd == 'start' or cmd == 'stop' or cmd not in eufyInterface.commands):
+                cmd = 'start_stop'
 
-                eufyInterface.emit(cmd)
-                return {'status': 'called '+cmd}
-            return {'status': 'eufy not enabled'}
+            eufyInterface.emit(cmd)
+            return {'status': 'called '+cmd}
+        return {'status': 'eufy not enabled'}
 
-        # allow remote pull to update code
-        @app.route('/pull', methods=['POST'])
-        def pull():
-           out = os.system('cd /home/pi/rpi-terminal-hub && git pull')
-           return {'status': 'ready for reboot'}
+    # allow remote pull to update code
+    @app.route('/pull', methods=['POST'])
+    def pull():
+       out = os.system('cd /home/pi/rpi-terminal-hub && git pull')
+       return {'status': 'ready for reboot'}
 
-        # allow remote pull to update code
-        @app.route('/logs', methods=['GET'])
-        def logs():
-            f = open('/home/pi/cron.log')
-            data = f.read()
-            f.close()
+    # allow remote pull to update code
+    @app.route('/logs', methods=['GET'])
+    def logs():
+        f = open('/home/pi/cron.log')
+        data = f.read()
+        f.close()
 
-            format = request.form.get('format')
-            if format == None or format.lower() == 'web':
-                data = data.replace('\n', '<br>')
+        format = request.form.get('format')
+        if format == None or format.lower() == 'web':
+            data = data.replace('\n', '<br>')
 
-            return data
+        return data
 
-        # allow reboot
-        @app.route('/reboot', methods=['POST'])
-        def reboot():
-            discardLog = request.form.get('discardLog')
-            if discardLog == "True":
-                os.system('rm /home/pi/cron.log')
+    # allow reboot
+    @app.route('/reboot', methods=['POST'])
+    def reboot():
+        discardLog = request.form.get('discardLog')
+        if discardLog == "True":
+            os.system('rm /home/pi/cron.log')
 
-            subprocess.Popen('sleep 10 && sudo reboot', shell=True)
-            return {'status': 'rebooting in 10 seconds'}
+        subprocess.Popen('sleep 10 && sudo reboot', shell=True)
+        return {'status': 'rebooting in 10 seconds'}
 
 
-        app.run(host='0.0.0.0')
-        p.join()
-
-    else:
-        loop = Loop(schedule)
+    app.run(host='0.0.0.0')
+    p.join()
