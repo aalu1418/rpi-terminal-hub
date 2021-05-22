@@ -75,4 +75,8 @@ RPi Timezones
 
 Server Inspiration
 * https://shkspr.mobi/blog/2020/02/turn-an-old-ereader-into-an-information-screen-nook-str/
-* Completed Look: ![](./media/NST_display.jpg)
+* Completed Look (interface is a bit outdated): ![](./media/NST_display.jpg)
+
+Ideas
+* Expand `ttc` module to `transit` module with custom pieces for various networks
+* Add `traffic` module for driving?
