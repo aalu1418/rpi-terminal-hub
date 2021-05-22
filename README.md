@@ -32,7 +32,11 @@ OWM_KEY=<insert api key here>
 
 ## Web Server
 Endpoint: `GET /`
-* Main endpoint for webpage with all information
+* Main endpoint for stylized webpage with all information
+
+Endpoint: `GET /raw`
+* Raw data used in stylized webpage
+* Viewable using http://localhost:5000/raw or `curl -X GET localhost:5000/raw`
 
 Endpoint: `POST /vacuum`
 * Example curl request: `curl -X POST -d "cmd=start" localhost:5000/vacuum`
@@ -77,4 +81,4 @@ Server Inspiration
 
 Ideas
 * Expand `ttc` module to `transit` module with custom pieces for various networks
-* Add `traffic` module for driving?
+* Add `traffic` module for driving commutes

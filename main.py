@@ -124,17 +124,25 @@ if __name__ == '__main__':
     p = Process(target=Loop, args=(schedule, output, eufy))
     p.start()
 
-    @app.route('/')
-    def index():
+    # pull data from queue until latest
+    def pullLatest():
         while not output.empty():
             app.output_data = output.get()
 
+    @app.route('/')
+    def index():
+        pullLatest()
         # return initial string if data is not loaded
         if type(app.output_data) is str:
             return app.output_data
 
         # return app.output_data
         return render_template('index.html', data=app.output_data)
+
+    @app.route('/raw', methods=['GET'])
+    def returnRaw():
+        pullLatest()
+        return app.output_data
 
     #  allow remote triggering of vacuum
     @app.route('/vacuum', methods=['POST'])
