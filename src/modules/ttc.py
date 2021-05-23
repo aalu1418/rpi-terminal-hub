@@ -1,5 +1,6 @@
 import requests, re, feedparser
 
+# module for toronto transit commission
 class TTC:
     def __init__(self):
         self.url = "http://ttc.ca/RSS/Service_Alerts/index.rss"
@@ -7,7 +8,6 @@ class TTC:
     def fetch(self):
         self.data = feedparser.parse(self.url)
         self.parse()
-
 
     def parse(self):
         self.data = [alert['summary'].replace(':', '') for alert in self.data['entries']]

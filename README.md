@@ -25,10 +25,16 @@ OWM_KEY=<insert api key here>
 * `pair()`: Sequence for recording various buttons on Eufy remote
 * `emit()`: Command for emitting specified IR commands. Inputs should be a matching string to the stored commands.
 
-### TTC
-`ttc.py`: Checks TTC (toronto transit system) website for alerts using Regex - only displays alerts for subway and streetcars.
-* `fetch()`: Pull HTML from [TTC alerts site](https://www.ttc.ca/Service_Advisories/all_service_alerts.jsp)
-* `parse()`: Filter the HTML data using Regex into an array of TTC lines with active alerts
+### Transit/Traffic
+`transit.py`: Acts as a wrapper for passed in city parameter for specific transit or traffic modules defined for each city.
+* `fetch()`: Runs the respective fetch command to retrieve and parse data.
+* `data`: The parsed data
+* Each submodule must have the following defined interface within the class:
+   * `init(self)`: no parameters can be passed in, initializes the data needed
+   * `fetch(self)`: no parameters, pulls and processes data into a `[]string`
+   * `data`: Class parameter where the `[]string` is stored
+   * Other functions may be included to assist with retrieving, processing, etc
+   * See the [Toronto Transit (TTC) module](./src/modules/ttc.py) as an example
 
 ## Web Server
 Endpoint: `GET /`
@@ -80,5 +86,4 @@ Server Inspiration
 * Completed Look (interface is a bit outdated): ![](./media/NST_display.jpg)
 
 Ideas
-* Expand `ttc` module to `transit` module with custom pieces for various networks
 * Add `traffic` module for driving commutes

@@ -1,7 +1,7 @@
 # custom modules
 from src.webTime import WebTime
 from src.weather import Weather, clear
-from src.ttc import TTC
+from src.transit import Transit
 # from src.eufy import Eufy # imported dynamically in the Loop() and '__main__'
 
 # public modules
@@ -24,7 +24,7 @@ class Loop():
             self.eufy = Eufy(filename=filename)
         self.webTime = WebTime()
         self.weather = Weather(location)
-        self.ttc = TTC()
+        self.transit = Transit(location)
 
         self.increment = increment
         self.schedule = {k:datetime.strptime(schedule[k],"%I%p").hour for k in schedule.keys()}
@@ -80,7 +80,7 @@ class Loop():
             try:
                 self.weather.fetch()
                 self.webTime.fetch()
-                self.ttc.fetch()
+                self.transit.fetch()
             except Exception as e:
                 traceback.print_exc()
                 sleep(30) #pause 30 seconds
@@ -88,7 +88,7 @@ class Loop():
 
             output.append(self.weather.data)
             output.append(f"Last Updated: {self.webTime.timestamp}")
-            output.append(f"TTC Alerts: {', '.join(self.ttc.data) or None}")
+            output.append(f"Transit/Traffic Alerts: {', '.join(self.transit.data) or None}")
 
             # scheduled tasks
             if hasattr(self, 'eufy') and self.scheduler():
@@ -97,7 +97,7 @@ class Loop():
 
             data = output[0]
             data["updated"] = output[1]
-            data["ttc"] = output[2] or None
+            data["transit"] = output[2] or None
             data["eufy"] = output[3]
             self.output.put(data)
 
