@@ -181,7 +181,7 @@ if __name__ == '__main__':
     def reboot():
         discardLog = request.form.get('discardLog')
         if discardLog == "True":
-            os.system('rm /home/pi/cron.log')
+            subprocess.Popen('sleep 5 && rm /home/pi/cron.log', shell=True)
 
         subprocess.Popen('sleep 10 && sudo reboot', shell=True)
         return {'status': 'rebooting in 10 seconds'}
