@@ -27,7 +27,7 @@ class Loop():
         self.transit = Transit(location)
 
         self.increment = increment
-        self.schedule = {k:datetime.strptime(schedule[k],"%I%p").hour for k in schedule.keys()}
+        self.schedule = {k:datetime.strptime(schedule[k],"%I:%M%p") for k in schedule.keys()}
         self.output = output
         self.start = True
 
@@ -59,7 +59,7 @@ class Loop():
 
             # if vacuum is supposed to be run today, check for the correct time
             if self.eufy.status == 1:
-                if hour == self.schedule[weekday] and minute < 5:
+                if hour == self.schedule[weekday].hour and self.schedule[weekday].minute-minute < 15:
                     self.eufy.status = 2
                     self.time = time()
                     return True
@@ -110,9 +110,9 @@ class Loop():
             sleep(self.delay)
 
 if __name__ == '__main__':
-    schedule = {"Tuesday": "6PM",
-                "Thursday": "6PM",
-                "Saturday": "1PM"}
+    schedule = {"Tuesday": "6:00PM",
+                "Thursday": "7:15PM",
+                "Saturday": "1:00PM"}
 
     eufy = False
     if "--no-eufy" not in sys.argv:
