@@ -59,7 +59,7 @@ class Loop():
 
             # if vacuum is supposed to be run today, check for the correct time
             if self.eufy.status == 1:
-                if hour == self.schedule[weekday].hour and self.schedule[weekday].minute-minute < 15:
+                if hour == self.schedule[weekday].hour and 0 <= self.schedule[weekday].minute-minute < 15:
                     self.eufy.status = 2
                     self.time = time()
                     return True
