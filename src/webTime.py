@@ -11,8 +11,12 @@ class WebTime:
         self.raw = datetime.strptime(res['currentDateTime'], "%Y-%m-%dT%H:%M%z")
         self.timestamp = self.raw.strftime("%b %d @ %I:%M %p")
         self.weekday = res["dayOfTheWeek"]
+        self.minute = self.raw.minute
+
+    def inc(self):
+        self.minute = (self.minute + 1) % 60
 
 if __name__ == '__main__':
     webTime = WebTime()
     webTime.fetch()
-    print(webTime.timestamp, webTime.weekday)
+    print(webTime.timestamp, webTime.weekdays)

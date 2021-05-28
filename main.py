@@ -2,6 +2,7 @@
 from src.webTime import WebTime
 from src.weather import Weather, clear
 from src.transit import Transit
+from src.state import State
 # from src.eufy import Eufy # imported dynamically in the Loop() and '__main__'
 
 # public modules
@@ -26,10 +27,13 @@ class Loop():
         self.weather = Weather(location)
         self.transit = Transit(location)
 
+        self.retry = False
         self.increment = increment
         self.schedule = {k:datetime.strptime(schedule[k],"%I:%M%p") for k in schedule.keys()}
         self.output = output
         self.start = True
+
+        self.data = State()
 
         if autorun:
             self.loop()
@@ -38,28 +42,27 @@ class Loop():
     def startup(self):
         os.system("sudo pigpiod")
 
-    # calculate seconds until next minute interval (aligned with the hour)
+    # calculate seconds until next minute interval
     def delayCalc(self):
-        inc_sec = 60*self.increment
         time_sec = round(time())
-        self.delay = inc_sec - time_sec % inc_sec
+        self.delay = 60 - time_sec % 60
 
     # track schedule and see if task needs to be run
     def scheduler(self):
         try:
             weekday = self.webTime.weekday
             hour = self.webTime.raw.hour
-            minute = self.webTime.raw.minute
+            minute = self.webTime.minute
 
             # check at midnight if vacuum is supposed to be run today (or on startup)
-            if (hour == 0 and minute < 5) or self.start:
+            if (hour == 0 and minute == 0) or self.start:
                 self.eufy.status = 0 # reset status
                 if weekday in self.schedule.keys():
                     self.eufy.status = 1
 
             # if vacuum is supposed to be run today, check for the correct time
             if self.eufy.status == 1:
-                if hour == self.schedule[weekday].hour and 0 <= self.schedule[weekday].minute-minute < 15:
+                if hour == self.schedule[weekday].hour and minute == self.schedule[weekday].minute:
                     self.eufy.status = 2
                     self.time = time()
                     return True
@@ -73,33 +76,38 @@ class Loop():
 
         return False
 
+    # fetch data with retry logic
+    def fetch(self):
+        try:
+            # fetch data
+            self.weather.fetch()
+            self.webTime.fetch()
+            self.transit.fetch()
+
+            # write data to state
+            self.data.update('weather', self.weather.data)
+            self.data.update('updated', f"Last Updated: {self.webTime.timestamp}")
+            self.data.update('transit', f"Transit/Traffic Alerts: {', '.join(self.transit.data) or None}")
+
+            self.retry = False
+        except Exception as e: # if error, retry in the next minute
+            self.retry = True
+
     def loop(self):
         while True:
-            output = []
+            # fetch data on first run or retyr request or based on minute interval
+            if self.start or self.retry or self.webTime.minute % self.increment == 0:
+                self.fetch()
 
-            try:
-                self.weather.fetch()
-                self.webTime.fetch()
-                self.transit.fetch()
-            except Exception as e:
-                traceback.print_exc()
-                sleep(30) #pause 30 seconds
-                continue #retry fetch
-
-            output.append(self.weather.data)
-            output.append(f"Last Updated: {self.webTime.timestamp}")
-            output.append(f"Transit/Traffic Alerts: {', '.join(self.transit.data) or None}")
-
-            # scheduled tasks
+            # run vacuum checks
             if hasattr(self, 'eufy') and self.scheduler():
                 self.eufy.emit('start_stop')
-            output.append(f"Eufy Status: {self.eufy.print() if hasattr(self, 'eufy') else 'N/A'}")
+            self.data.update("eufy", f"Eufy Status: {self.eufy.print() if hasattr(self, 'eufy') else 'N/A'}")
 
-            data = output[0]
-            data["updated"] = output[1]
-            data["transit"] = output[2] or None
-            data["eufy"] = output[3]
-            self.output.put(data)
+            # if data is changed, push data to queue
+            if self.data.changed:
+                self.output.put(self.data.__dict__) # return data
+                self.data.clear() # clear changed state
 
             # clear start up triggers
             if self.start:
@@ -107,6 +115,7 @@ class Loop():
 
             # pause until next interval
             self.delayCalc()
+            self.webTime.inc() # increment minute (not polling API every minute)
             sleep(self.delay)
 
 if __name__ == '__main__':
