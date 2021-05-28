@@ -5,14 +5,10 @@ class State:
         self.changed = False
 
     def update(self, key, data):
-        if not hasattr(self, key): # if new key, set
+        # if new key or value is different, set
+        if not hasattr(self, key) or json.dumps(data) != json.dumps(getattr(self, key)):
             setattr(self, key, data)
             self.changed = True
-            return
-
-        self.changed = json.dumps(data) != json.dumps(getattr(self, key)) # check if existing value matchess
-        if self.changed: # if check does not match, update
-            setattr(self, key, data)
 
     def clear(self):
         self.changed = False
