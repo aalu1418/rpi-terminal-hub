@@ -18,16 +18,17 @@ class State:
         self.changed = False
 
 if __name__ == '__main__':
-    def printVar():
+    def printVar(func=None, *args):
+        if func is not None:
+            func(*args)
         print('Update:', test.changed, test.__dict__)
 
     test = State()
-    printVar()
-    test.update('something', 1)
-    printVar()
-    test.clear()
-    printVar()
-    test.update('something', 1)
-    printVar()
-    test.update('something', 2)
-    printVar()
+    params = [[None],
+    [test.update, 'something', 1],
+    [test.clear],
+    [test.update, 'something', 1],
+    [test.update, 'something', 2]]
+
+    for param in params:
+        printVar(*param)
