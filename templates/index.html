@@ -33,7 +33,8 @@
         padding-left: 1rem;
         width: auto;
       }
-      #forecast th, #forecast td {
+      #forecast th,
+      #forecast td {
         border: 5px solid #555;
         width: 25%;
         font-size: 1.5rem;
@@ -52,18 +53,23 @@
       #details td {
         font-size: 0.75rem;
         padding: 1px;
-        text-align: left
+        text-align: left;
       }
     </style>
   </head>
-  <body style="width: 580px; height: 800px;">
+  <body style="width: 580px; height: 800px">
     <table>
       <tr>
         <td>
-          <img class="large-icon" src="/static/{{data.weather.current.iconPath}}.png"/>
+          <img
+            class="large-icon"
+            src="/static/{{data.weather.current.iconPath}}.png"
+          />
         </td>
         <th>
-          {{data.weather.current.temp}}<span style="font-size: 25%">&#176;{{data.weather.units.temp}}</span>
+          {{data.weather.current.temp}}<span style="font-size: 25%"
+            >&#176;{{data.weather.units.temp}}</span
+          >
         </th>
       </tr>
       <tr>
@@ -71,20 +77,36 @@
         <td>
           <table id="currently">
             <tr>
-              <td><img class="small-icon" src="/static/wi-thermometer.png"/></td>
-              <td>{{data.weather.current.temp_feel}}&#176;{{data.weather.units.temp}}</td>
+              <td>
+                <img class="small-icon" src="/static/wi-thermometer.png" />
+              </td>
+              <td>
+                {{data.weather.current.temp_feel}}&#176;{{data.weather.units.temp}}
+              </td>
             </tr>
             <tr>
-              <td><img class="small-icon" src="/static/wi-strong-wind.png"/></td>
-              <td>{{data.weather.current.wind}}-{{data.weather.current.gust}} {{data.weather.units.speed}}</td>
+              <td>
+                <img class="small-icon" src="/static/wi-strong-wind.png" />
+              </td>
+              <td>
+                {{data.weather.current.wind}}-{{data.weather.current.gust}}
+                {{data.weather.units.speed}}
+              </td>
             </tr>
             <tr>
-              <td><img class="small-icon" src="/static/wi-humidity.png"/></td>
+              <td><img class="small-icon" src="/static/wi-humidity.png" /></td>
               <td>{{data.weather.current.humidity}}%</td>
             </tr>
             <tr>
-              <td><img class="small-icon" src="/static/wi-raindrops.png"/>/<img class="small-icon" src="/static/wi-snowflake-cold.png"/></td>
-              <td>{{data.weather.current.precip}} {{data.weather.units.precip}}</td>
+              <td>
+                <img class="small-icon" src="/static/wi-raindrops.png" />/<img
+                  class="small-icon"
+                  src="/static/wi-snowflake-cold.png"
+                />
+              </td>
+              <td>
+                {{data.weather.current.precip}} {{data.weather.units.precip}}
+              </td>
             </tr>
           </table>
         </td>
@@ -92,7 +114,7 @@
     </table>
     <table>
       <tr>
-        <th style="font-size: 4rem">{{data.weather.current.dt}}</td>
+        <th style="font-size: 4rem">{{data.weather.current.dt}}</th>
       </tr>
     </table>
     <table id="forecast">
@@ -103,10 +125,18 @@
         <th>{{data.weather.forecast[3].hour}}</th>
       </tr>
       <tr>
-        <td>{{data.weather.forecast[0].temp}}({{data.weather.forecast[0].temp_feel_round}})&#176;{{data.weather.units.temp}}</td>
-        <td>{{data.weather.forecast[1].temp}}({{data.weather.forecast[1].temp_feel_round}})&#176;{{data.weather.units.temp}}</td>
-        <td>{{data.weather.forecast[2].temp}}({{data.weather.forecast[2].temp_feel_round}})&#176;{{data.weather.units.temp}}</td>
-        <td>{{data.weather.forecast[3].temp}}({{data.weather.forecast[3].temp_feel_round}})&#176;{{data.weather.units.temp}}</td>
+        <td>
+          {{data.weather.forecast[0].temp}}({{data.weather.forecast[0].temp_feel_round}})&#176;{{data.weather.units.temp}}
+        </td>
+        <td>
+          {{data.weather.forecast[1].temp}}({{data.weather.forecast[1].temp_feel_round}})&#176;{{data.weather.units.temp}}
+        </td>
+        <td>
+          {{data.weather.forecast[2].temp}}({{data.weather.forecast[2].temp_feel_round}})&#176;{{data.weather.units.temp}}
+        </td>
+        <td>
+          {{data.weather.forecast[3].temp}}({{data.weather.forecast[3].temp_feel_round}})&#176;{{data.weather.units.temp}}
+        </td>
       </tr>
       <tr>
         <td class="small">{{data.weather.forecast[0].condition}}</td>
@@ -115,16 +145,36 @@
         <td class="small">{{data.weather.forecast[3].condition}}</td>
       </tr>
       <tr>
-        <td class="small">{{data.weather.forecast[0].precip}} {{data.weather.units.precip}} | {{data.weather.forecast[0].precip_percent}}%</td>
-        <td class="small">{{data.weather.forecast[1].precip}} {{data.weather.units.precip}} | {{data.weather.forecast[1].precip_percent}}%</td>
-        <td class="small">{{data.weather.forecast[2].precip}} {{data.weather.units.precip}} | {{data.weather.forecast[2].precip_percent}}%</td>
-        <td class="small">{{data.weather.forecast[3].precip}} {{data.weather.units.precip}} | {{data.weather.forecast[3].precip_percent}}%</td>
+        <td class="small">
+          {{data.weather.forecast[0].precip}} {{data.weather.units.precip}} |
+          {{data.weather.forecast[0].precip_percent}}%
+        </td>
+        <td class="small">
+          {{data.weather.forecast[1].precip}} {{data.weather.units.precip}} |
+          {{data.weather.forecast[1].precip_percent}}%
+        </td>
+        <td class="small">
+          {{data.weather.forecast[2].precip}} {{data.weather.units.precip}} |
+          {{data.weather.forecast[2].precip_percent}}%
+        </td>
+        <td class="small">
+          {{data.weather.forecast[3].precip}} {{data.weather.units.precip}} |
+          {{data.weather.forecast[3].precip_percent}}%
+        </td>
       </tr>
       <tr>
-        <td class="small">{{data.weather.forecast[0].wind}} {{data.weather.units.speed}}</td>
-        <td class="small">{{data.weather.forecast[1].wind}} {{data.weather.units.speed}}</td>
-        <td class="small">{{data.weather.forecast[2].wind}} {{data.weather.units.speed}}</td>
-        <td class="small">{{data.weather.forecast[3].wind}} {{data.weather.units.speed}}</td>
+        <td class="small">
+          {{data.weather.forecast[0].wind}} {{data.weather.units.speed}}
+        </td>
+        <td class="small">
+          {{data.weather.forecast[1].wind}} {{data.weather.units.speed}}
+        </td>
+        <td class="small">
+          {{data.weather.forecast[2].wind}} {{data.weather.units.speed}}
+        </td>
+        <td class="small">
+          {{data.weather.forecast[3].wind}} {{data.weather.units.speed}}
+        </td>
       </tr>
     </table>
     <table id="details">

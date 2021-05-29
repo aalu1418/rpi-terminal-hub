@@ -1,12 +1,11 @@
 # accomodates different usage scopes for modules
 try:
-    from modules import * # scope for running transit.py directly
+    from modules import *  # scope for running transit.py directly
 except Exception as e:
-    from src.modules import * # scope for running transit in main.py
+    from src.modules import *  # scope for running transit in main.py
 
-options = {
-    "toronto": ttc.TTC
-}
+options = {"toronto": ttc.TTC}
+
 
 class Transit:
     def __init__(self, location):
@@ -18,7 +17,8 @@ class Transit:
         self.submodule.fetch()
         self.data = self.submodule.data
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     transit = Transit("toronto")
     transit.fetch()
     print(transit.data)
