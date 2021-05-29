@@ -28,13 +28,17 @@
       }
       #currently-sub {
         margin-bottom: 0;
+        width: auto !important;
+        margin: auto;
       }
       #currently-sub td {
         padding: 0px;
+        padding-left: 1rem;
+        width: auto;
       }
-      #currently-sub td:first-of-type {
+      /* #currently-sub td:first-of-type {
         width: 2rem;
-      }
+      } */
       #forecast th, #forecast td {
         border: 5px solid #555;
         width: 25%;
@@ -87,7 +91,14 @@
             </tr>
           </table>
         </td>
-        <td>Precip:<br>{{data.weather.current.precip}} {{data.weather.units.precip}}</td>
+        <td>
+          <table id="currently-sub">
+            <tr>
+              <td><img class="small-icon" src="/static/wi-raindrops.png"/>/<img class="small-icon" src="/static/wi-snowflake-cold.png"/></td>
+              <td>{{data.weather.current.precip}} {{data.weather.units.precip}}</td>
+            </tr>
+          </table>
+        </td>
       </tr>
     </table>
     <table>
