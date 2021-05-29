@@ -24,7 +24,7 @@ iconMappings = {
 
 def iconMapper(icon):
     prefix = 'wi'
-    dayNight = 'day' if icon[-1] is 'd' else 'night-alt'
+    dayNight = 'day' if icon[-1] == 'd' else 'night-alt'
 
     try:
         name = iconMappings[icon[:2]]
@@ -81,6 +81,7 @@ class Weather():
                     "temp": round(d["main"]["temp"]),
                     "temp_feel": d["main"]["feels_like"],
                     "temp_feel_round": round(d["main"]["feels_like"]),
+                    "humidity": d["main"]["humidity"],
                     "wind": round(d["wind"]["speed"]*factor),
                     "gust": round(d["wind"]["gust"]*factor),
                     "precip": round(sum(d['rain'].values()) + sum(d['snow'].values()), 1),

@@ -20,23 +20,36 @@
         padding: 0px;
       }
       td {
-        font-size: 2em;
+        font-size: 2rem;
         padding: 7px;
       }
       #currently td {
         width: 250px;
+      }
+      #currently-sub {
+        margin-bottom: 0;
+      }
+      #currently-sub td {
+        padding: 0px;
+      }
+      #currently-sub td:first-of-type {
+        width: 2rem;
       }
       #forecast th, #forecast td {
         border: 5px solid #555;
         width: 25%;
         font-size: 1.5rem;
       }
-       .small {
+      .small {
         font-size: 1rem !important;
       }
-      img {
+      .large-icon {
         min-width: 200px;
         max-height: 11rem;
+      }
+      .small-icon {
+        height: 3rem;
+        margin: -0.8rem;
       }
       #details td {
         font-size: 0.75rem;
@@ -49,7 +62,7 @@
     <table style="margin-bottom: 0">
       <tr>
         <td>
-          <img src="/static/{{data.weather.current.iconPath}}.png"/>
+          <img class="large-icon" src="/static/{{data.weather.current.iconPath}}.png"/>
         </td>
         <th>
           {{data.weather.current.temp}}<span style="font-size: 25%">&#176;{{data.weather.units.temp}}</span>
@@ -62,7 +75,18 @@
         <td>Feels like:<br>{{data.weather.current.temp_feel}}&#176;{{data.weather.units.temp}}</td>
       </tr>
       <tr>
-        <td>Wind:<br>{{data.weather.current.wind}}-{{data.weather.current.gust}} {{data.weather.units.speed}}</td>
+        <td>
+          <table id="currently-sub">
+            <tr>
+              <td><img class="small-icon" src="/static/wi-strong-wind.png"/></td>
+              <td>{{data.weather.current.wind}}-{{data.weather.current.gust}} {{data.weather.units.speed}}</td>
+            </tr>
+            <tr>
+              <td><img class="small-icon" src="/static/wi-humidity.png"/></td>
+              <td>{{data.weather.current.humidity}}%</td>
+            </tr>
+          </table>
+        </td>
         <td>Precip:<br>{{data.weather.current.precip}} {{data.weather.units.precip}}</td>
       </tr>
     </table>
