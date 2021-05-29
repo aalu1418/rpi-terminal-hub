@@ -169,7 +169,7 @@ if __name__ == '__main__':
     # allow remote pull to update code
     @app.route('/pull', methods=['POST'])
     def pull():
-       out = os.system('cd /home/pi/rpi-terminal-hub && git pull')
+       os.system('cd /home/pi/rpi-terminal-hub && git pull')
        return {'status': 'ready for reboot'}
 
     # allow remote pull to update code
@@ -188,10 +188,7 @@ if __name__ == '__main__':
     # allow reboot
     @app.route('/reboot', methods=['POST'])
     def reboot():
-        discardLog = request.form.get('discardLog')
-        if discardLog == "True":
-            subprocess.Popen('sleep 5 && rm /home/pi/cron.log', shell=True)
-
+        subprocess.Popen('sleep 5 && rm /home/pi/cron.log', shell=True)
         subprocess.Popen('sleep 10 && sudo reboot', shell=True)
         return {'status': 'rebooting in 10 seconds'}
 

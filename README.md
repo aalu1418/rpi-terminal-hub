@@ -60,7 +60,7 @@ Endpoint `GET /logs`
 
 Endpoint `POST /reboot`
 * Restarts the server
-* Example curl request: `curl -X POST -d "discardLog=True" localhost:5000/reboot`
+* Example curl request: `curl -X POST localhost:5000/reboot`
 
 ## Notes
 Autorun on RPi using CRON
