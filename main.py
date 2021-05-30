@@ -150,7 +150,6 @@ if __name__ == "__main__":
     )
     schedule = json.load(f)
     f.close()
-    print(schedule)
 
     eufy = False
     if "--no-eufy" not in sys.argv:
