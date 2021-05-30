@@ -11,6 +11,6 @@ if [ "$SERVER" = "" ]; then
   SERVER="localhost"
 fi
 
-sleep 5 && curl -X POST "$SERVER:5000/pull" > /dev/null &
+curl -X POST "$SERVER:5000/pull"
 
-## sleep 10 && curl -X POST "$SERVER:5000/reboot" &
+sleep 5 && curl -X POST "$SERVER:5000/reboot"
