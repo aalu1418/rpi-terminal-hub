@@ -12,10 +12,10 @@ The `main.py` file contains the primary logic of continuously running the code. 
 
 The following environments are needed for all components to work correctly.
 
-| Name      | Description                                                                              | Required |
-| --------- | ---------------------------------------------------------------------------------------- | -------- |
-| `OWM_KEY` | OpenWeatherMap API key, needed for `weather.py` to function                              | Yes      |
-| `SERVER`  | Remote server address, needed for `pre-push` hook to communicate with the correct server | No       |
+| Name      | Description                                                                                                                  | Required |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `OWM_KEY` | OpenWeatherMap API key, needed for `weather.py` to function                                                                  | Yes      |
+| `SERVER`  | Remote server address, needed for `scripts/triggerServer.sh` to communicate with the correct server, defaults to `localhost` | No       |
 
 ```
 OWM_KEY=someRandomAPIKey
