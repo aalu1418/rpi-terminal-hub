@@ -127,8 +127,7 @@ Pre-Commit Hooks
 
 ```bash
 pip3 install pre-commit
-pre-commit install
-pre-commit install --hook-type pre-push
+pre-commit install && pre-commit install --hook-type pre-push
 ```
 
 Ideas

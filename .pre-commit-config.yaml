@@ -1,21 +1,27 @@
-default_stages: [commit]
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.0.1
     hooks:
       - id: check-ast
+        stages: [commit]
       - id: check-json
+        stages: [commit]
       - id: end-of-file-fixer
+        stages: [commit]
       - id: trailing-whitespace
+        stages: [commit]
       - id: check-shebang-scripts-are-executable
+        stages: [commit]
   - repo: https://github.com/psf/black
     rev: 21.5b1
     hooks:
       - id: black
+        stages: [commit]
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v2.3.0
     hooks:
       - id: prettier
+        stages: [commit]
   - repo: local
     hooks:
       - id: trigger-remote-server
