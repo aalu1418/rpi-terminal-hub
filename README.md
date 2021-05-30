@@ -2,11 +2,25 @@
 
 Turning a RPi into a server hub using Raspian OS Lite.
 
-Credits: Icons created by [@erikflowers](https://github.com/erikflowers/weather-iconss)
+Credits: Icons created by [@erikflowers](https://github.com/erikflowers/weather-icons)
 
 The `main.py` file contains the primary logic of continuously running the code. It handles updating the weather data (every 15 minutes), and also triggering scheduled events (specifically for the robot vacuum). It outputs data as a Flask app at http://0.0.0.0:5000.
 
 - `--no-eufy`: Useful flag when testing locally where the GPIO libraries are not installed. Skips the eufy related portions in the code.
+
+## Environment Variables
+
+The following environments are needed for all components to work correctly.
+
+| Name      | Description                                                                              | Required |
+| --------- | ---------------------------------------------------------------------------------------- | -------- |
+| `OWM_KEY` | OpenWeatherMap API key, needed for `weather.py` to function                              | Yes      |
+| `SERVER`  | Remote server address, needed for `pre-push` hook to communicate with the correct server | No       |
+
+```
+OWM_KEY=someRandomAPIKey
+SERVER=192.168.1.104
+```
 
 ## Modules
 
@@ -22,11 +36,7 @@ Various integrations for controlling / reporting devices and information.
 
 `weather.py`: Fetches weather based on submitted location, and returns it as a data struct. Takes a `location [string]` parameter
 
-- `fetch()`: Pulls from OpenWeatherMap and returns struct for the server page. Requires a `.env` file with the contents:
-
-```
-OWM_KEY=<insert api key here>
-```
+- `fetch()`: Pulls from OpenWeatherMap and returns struct for the server page.
 
 ### Eufy
 
