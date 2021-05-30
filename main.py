@@ -3,6 +3,7 @@ from src.webTime import WebTime
 from src.weather import Weather, clear
 from src.transit import Transit
 from src.state import State
+from src.commands import Cmd
 
 # from src.eufy import Eufy # imported dynamically in the Loop() and '__main__'
 
@@ -203,7 +204,8 @@ if __name__ == "__main__":
     # allow remote pull to update code
     @app.route("/pull", methods=["POST"])
     def pull():
-        os.system("cd /home/pi/rpi-terminal-hub && git pull")
+        c = Cmd()
+        os.system(c.pull)
         return {"status": "ready for reboot"}
 
     # allow remote pull to update code
@@ -222,9 +224,19 @@ if __name__ == "__main__":
     # allow reboot
     @app.route("/reboot", methods=["POST"])
     def reboot():
-        subprocess.Popen("sleep 5 && rm /home/pi/cron.log", shell=True)
-        subprocess.Popen("sleep 10 && sudo reboot", shell=True)
+        c = Cmd()
+        subprocess.Popen(c.rmLog, shell=True)
+        subprocess.Popen(c.reboot, shell=True)
         return {"status": "rebooting in 10 seconds"}
+
+    # called before pushing to have server auto pull + reboot
+    @app.route("/pre-push", methods=["POST"])
+    def prePush():
+        c = Cmd(15)
+        seq = [c.pull, c.rmLog, c.reboot]
+        for s in seq:
+            subprocess.Popen(s, shell=True)
+        return {"status": "ready for push"}
 
     app.run(host="0.0.0.0")
     p.join()

@@ -11,6 +11,4 @@ if [ "$SERVER" = "" ]; then
   SERVER="localhost"
 fi
 
-curl -X POST "$SERVER:5000/pull"
-
-sleep 5 && curl -X POST "$SERVER:5000/reboot"
+curl -X POST "$SERVER:5000/pre-push"

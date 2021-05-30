@@ -58,6 +58,11 @@ Various integrations for controlling / reporting devices and information.
   - Other functions may be included to assist with retrieving, processing, etc
   - See the [Toronto Transit (TTC) module](./src/modules/ttc.py) as an example
 
+### Other
+
+- `state.py`: data state management for main loop
+- `commands.py`: simplified command line text for modifying sleep/delays
+
 ## Web Server
 
 Endpoint: `GET /`
@@ -90,6 +95,11 @@ Endpoint `POST /reboot`
 
 - Restarts the server
 - Example curl request: `curl -X POST localhost:5000/reboot`
+
+Endpoint `POST /pre-push`
+
+- Endpoint called in `pre-push` hook (delay for push before pull/reboot)
+- Example curl request: `curl -X POST localhost:5000/pre-push`
 
 ## Notes
 
@@ -127,7 +137,7 @@ Pre-Commit Hooks
 
 ```bash
 pip3 install pre-commit
-pre-commit install
+pre-commit install && pre-commit install --hook-type pre-push
 ```
 
 Ideas
