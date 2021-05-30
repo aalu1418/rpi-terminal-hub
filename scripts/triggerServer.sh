@@ -14,4 +14,4 @@ fi
 sleep 5 && curl -X POST "$SERVER:5000/pull" > /dev/null &
 
 
-# sleep 10 && curl -X POST "$SERVER:5000/reboot" &
+## sleep 10 && curl -X POST "$SERVER:5000/reboot" &
