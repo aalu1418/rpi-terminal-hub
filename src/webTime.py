@@ -13,9 +13,12 @@ class WebTime:
         self.timestamp = self.raw.strftime("%b %d @ %I:%M %p")
         self.weekday = res["dayOfTheWeek"]
         self.minute = self.raw.minute
+        self.hour = self.raw.hour
 
     def inc(self):
         self.minute = (self.minute + 1) % 60
+        if self.minute == 0:
+            self.hour = (self.hour + 1) % 24
 
 
 if __name__ == "__main__":

@@ -9,7 +9,7 @@ from src.state import State
 # public modules
 from time import time, sleep
 from datetime import datetime
-import os, sys, traceback, subprocess
+import os, sys, traceback, subprocess, json
 from multiprocessing import Process, Queue
 
 # flask server
@@ -65,14 +65,16 @@ class Loop:
     def scheduler(self):
         try:
             weekday = self.webTime.weekday
-            hour = self.webTime.raw.hour
+            hour = self.webTime.hour
             minute = self.webTime.minute
 
-            # check at midnight if vacuum is supposed to be run today (or on startup)
+            # reset status at midnight or on start
             if (hour == 0 and minute == 0) or self.start:
                 self.eufy.status = 0  # reset status
-                if weekday in self.schedule.keys():
-                    self.eufy.status = 1
+
+            # if there a schedule for today and it is not scheduled, change to scheduled
+            if weekday in self.schedule.keys() and self.eufy.status == 0:
+                self.eufy.status = 1
 
             # if vacuum is supposed to be run today, check for the correct time
             if self.eufy.status == 1:
@@ -84,8 +86,8 @@ class Loop:
                     self.time = time()
                     return True
 
-            # if vacuum is running, after one hour mark as complete
-            if self.eufy.status == 2 and time() - self.time > 60 * 60:
+            # if vacuum is running, after 1.5 hours mark as complete
+            if self.eufy.status == 2 and time() - self.time > 90 * 60:
                 self.eufy.status = 3
         except Exception as e:
             self.eufy.status = 0  # reset status on error & log
@@ -115,7 +117,7 @@ class Loop:
 
     def loop(self):
         while True:
-            # fetch data on first run or retyr request or based on minute interval
+            # fetch data on first run or retry request or based on minute interval
             if self.start or self.retry or self.webTime.minute % self.increment == 0:
                 self.fetch()
 
@@ -143,7 +145,12 @@ class Loop:
 
 
 if __name__ == "__main__":
-    schedule = {"Tuesday": "6:00PM", "Thursday": "7:15PM", "Saturday": "1:00PM"}
+    f = open(
+        "./data/schedule.json",
+    )
+    schedule = json.load(f)
+    f.close()
+    print(schedule)
 
     eufy = False
     if "--no-eufy" not in sys.argv:
