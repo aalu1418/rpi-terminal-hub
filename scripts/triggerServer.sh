@@ -11,4 +11,9 @@ if [ "$SERVER" = "" ]; then
   SERVER="localhost"
 fi
 
-curl -X POST "$SERVER:5000/pre-push"
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# only trigger if push occurs on the 'main' branch
+if [ "$BRANCH" = "main" ]; then
+  curl -X POST "$SERVER:5000/pre-push"
+fi
