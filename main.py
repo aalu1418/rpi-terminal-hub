@@ -22,14 +22,25 @@ app.output_data = "Hello, World"  # storing data for output
 class Loop:
     def __init__(
         self,
-        schedule={},
         output=None,
         eufy=True,
         location="Toronto",
         filename="/home/pi/rpi-terminal-hub/data/eufy.json",
         increment=15,
         autorun=True,
+        schedulePath="./data/schedule.json",
     ):
+        try:  # try absolute path for schedule data
+            f = open(
+                "/home/pi/rpi-terminal-hub/data/schedule.json",
+            )
+        except Exception as e:  # use relative path if that fails
+            f = open(
+                schedulePath,
+            )
+        schedule = json.load(f)
+        f.close()
+
         if eufy:
             from src.eufy import Eufy
 
@@ -145,12 +156,6 @@ class Loop:
 
 
 if __name__ == "__main__":
-    f = open(
-        "./data/schedule.json",
-    )
-    schedule = json.load(f)
-    f.close()
-
     eufy = False
     if "--no-eufy" not in sys.argv:
         from src.eufy import Eufy
@@ -159,7 +164,7 @@ if __name__ == "__main__":
 
     # requires multiprocessing to run Flask server + loop
     output = Queue()
-    p = Process(target=Loop, args=(schedule, output, eufy))
+    p = Process(target=Loop, args=(output, eufy))
     p.start()
 
     # pull data from queue until latest
