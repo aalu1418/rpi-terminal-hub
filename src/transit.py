@@ -4,7 +4,7 @@ try:
 except Exception as e:
     from src.modules import *  # scope for running transit in main.py
 
-options = {"toronto": ttc.TTC}
+options = {"toronto, on": ttc.TTC}
 
 
 class Transit:
@@ -19,6 +19,6 @@ class Transit:
 
 
 if __name__ == "__main__":
-    transit = Transit("toronto")
+    transit = Transit("toronto, on")
     transit.fetch()
     print(transit.data)

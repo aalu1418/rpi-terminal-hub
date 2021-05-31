@@ -3,14 +3,14 @@ from src.webTime import WebTime
 from src.weather import Weather, clear
 from src.transit import Transit
 from src.state import State
-from src.commands import Cmd
+from src.utils import Cmd, getData
 
 # from src.eufy import Eufy # imported dynamically in the Loop() and '__main__'
 
 # public modules
 from time import time, sleep
 from datetime import datetime
-import os, sys, traceback, subprocess, json
+import os, sys, traceback, subprocess
 from multiprocessing import Process, Queue
 
 # flask server
@@ -25,22 +25,13 @@ class Loop:
         self,
         output=None,
         eufy=True,
-        location="Toronto",
+        location=None,
         filename="/home/pi/rpi-terminal-hub/data/eufy.json",
         increment=15,
         autorun=True,
-        schedulePath="./data/schedule.json",
     ):
-        try:  # try absolute path for schedule data
-            f = open(
-                "/home/pi/rpi-terminal-hub/data/schedule.json",
-            )
-        except Exception as e:  # use relative path if that fails
-            f = open(
-                schedulePath,
-            )
-        schedule = json.load(f)
-        f.close()
+        schedule = getData("schedule.json")
+        locations = getData("locations.json")
 
         if eufy:
             from src.eufy import Eufy
@@ -48,8 +39,8 @@ class Loop:
             self.startup()
             self.eufy = Eufy(filename=filename)
         self.webTime = WebTime()
-        self.weather = Weather(location)
-        self.transit = Transit(location)
+        self.weather = Weather(locations, location)
+        self.transit = Transit(location or list(locations.keys())[0])
 
         self.retry = False
         self.increment = increment

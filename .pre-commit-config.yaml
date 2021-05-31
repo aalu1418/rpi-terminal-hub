@@ -24,6 +24,11 @@ repos:
         stages: [commit]
   - repo: local
     hooks:
+      - id: validate-json
+        name: validate-json
+        entry: python3 ./scripts/validateJson.py
+        language: system
+        stages: [commit]
       - id: trigger-remote-server
         name: trigger-remote-server
         entry: ./scripts/triggerServer.sh

@@ -34,7 +34,7 @@ Various integrations for controlling / reporting devices and information.
 
 ### Weather
 
-`weather.py`: Fetches weather based on submitted location, and returns it as a data struct. Takes a `location [string]` parameter
+`weather.py`: Fetches weather based on submitted location, and returns it as a data struct. Takes a `location [string]` parameter (optional, defaults to first entry in [`locations.json`](./data/locations.json)). To find the coordinates of a location follow [this guide for Google Maps](https://support.google.com/maps/answer/18539?co=GENIE.Platform%3DDesktop&hl=en).
 
 - `fetch()`: Pulls from OpenWeatherMap and returns struct for the server page.
 

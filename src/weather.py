@@ -40,17 +40,21 @@ def iconMapper(icon):
 
 
 class Weather:
-    def __init__(self, location, units="metric"):
-        self.location = location
+    def __init__(self, locations, location=None):
+        # use first location in json if key is not defined
+        if location == None or location not in locations:
+            location = list(locations.keys())[0]
+
+        self.name = location
+        self.location = locations[location]
         self.json = json
-        self.units = units
 
     def fetch(self):
         KEY = os.getenv("OWM_KEY")
-        query = f"?q={self.location}&appid={KEY}&units={self.units}"
+        query = f"?lat={self.location['lat']}&lon={self.location['lon']}&appid={KEY}&units={self.location['units']}"
 
         # units
-        if self.units == "imperial":
+        if self.location["units"] == "imperial":
             units = {"temp": "F", "precip": "mm", "speed": "mph"}
         else:
             units = {"temp": "C", "precip": "mm", "speed": "km/h"}
@@ -68,24 +72,28 @@ class Weather:
                 d["pop"] = 0
 
             # handle missing wind data
-            if "wind" in d.keys() and "gust" not in d["wind"].keys():
-                d["wind"]["gust"] = 0
+            if "wind_gust" not in d.keys():
+                d["wind_gust"] = 0
 
             # adjust wind units
             factor = 60 * 60 / 1000
-            if self.units == "imperial":
+            if self.location["units"] == "imperial":
                 factor = 1
 
             date = datetime.fromtimestamp(d["dt"])
+            wind = (
+                f"{round(d['wind_speed'] * factor)}-{round(d['wind_gust'] * factor)}"
+                if d["wind_gust"] != 0
+                else round(d["wind_speed"] * factor)
+            )
 
             return {
                 "condition": d["weather"][0]["description"].title(),
-                "temp": round(d["main"]["temp"]),
-                "temp_feel": d["main"]["feels_like"],
-                "temp_feel_round": round(d["main"]["feels_like"]),
-                "humidity": d["main"]["humidity"],
-                "wind": round(d["wind"]["speed"] * factor),
-                "gust": round(d["wind"]["gust"] * factor),
+                "temp": round(d["temp"]),
+                "temp_feel": d["feels_like"],
+                "temp_feel_round": round(d["feels_like"]),
+                "humidity": d["humidity"],
+                "wind": wind,
                 "precip": round(sum(d["rain"].values()) + sum(d["snow"].values()), 1),
                 "dt": date.strftime("%a %d %b"),
                 "hour": date.strftime("%I:%M %p"),
@@ -93,27 +101,26 @@ class Weather:
                 "iconPath": iconMapper(d["weather"][0]["icon"]),
             }
 
-        # fetch current
-        res = requests.get("https://api.openweathermap.org/data/2.5/weather" + query)
+        # fetch onecall
+        res = requests.get("https://api.openweathermap.org/data/2.5/onecall" + query)
         res = res.json()
 
-        self.data["current"] = parse(res)
-        self.data[
-            "location"
-        ] = f"Location: {res['name']} [{res['coord']['lat']}, {res['coord']['lon']}]"
+        # parse current
+        self.data["current"] = parse(res["current"])
+        self.data["location"] = f"Location: {self.name}"
 
-        # fetch forecast
-        res = requests.get("https://api.openweathermap.org/data/2.5/forecast" + query)
-        res = res.json()
-        res = res["list"][0:4]
+        # parse forecast
         forecast = []
-        for i in res:
+        for i in [res["hourly"][x] for x in range(1, 12, 3)]:
             forecast.append(parse(i))
         self.data["forecast"] = forecast
 
 
 if __name__ == "__main__":
-    weather = Weather("Toronto")
+    from utils import getData
+
+    locations = getData("locations.json")
+    weather = Weather(locations)
     clear()
     while True:
         weather.fetch()

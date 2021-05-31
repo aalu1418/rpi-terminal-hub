@@ -22,10 +22,12 @@
       td {
         font-size: 2rem;
         padding: 7px;
+        max-width: 250px;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       #currently {
         margin-bottom: 0;
-        width: auto !important;
         margin: auto;
       }
       #currently td {
@@ -89,8 +91,7 @@
                 <img class="small-icon" src="/static/wi-strong-wind.png" />
               </td>
               <td>
-                {{data.weather.current.wind}}-{{data.weather.current.gust}}
-                {{data.weather.units.speed}}
+                {{data.weather.current.wind}} {{data.weather.units.speed}}
               </td>
             </tr>
             <tr>
