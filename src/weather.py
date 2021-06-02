@@ -51,7 +51,7 @@ class Weather:
 
     def fetch(self):
         KEY = os.getenv("OWM_KEY")
-        query = f"?lat={self.location['lat']}&lon={self.location['lon']}&appid={KEY}&units={self.location['units']}"
+        query = f"?lat={self.location['lat']}&lon={self.location['lon']}&appid={KEY}&units={self.location['units']}&exclude=minutely,daily"
 
         # units
         if self.location["units"] == "imperial":
@@ -66,10 +66,6 @@ class Weather:
             for i in ["rain", "snow"]:
                 if i not in d.keys():
                     d[i] = {"1h": 0, "3h": 0}
-
-            # handle missing probability of precipitation in current weather
-            if "pop" not in d.keys():
-                d["pop"] = 0
 
             # handle missing wind data
             if "wind_gust" not in d.keys():
@@ -104,6 +100,9 @@ class Weather:
         # fetch onecall
         res = requests.get("https://api.openweathermap.org/data/2.5/onecall" + query)
         res = res.json()
+
+        # add POP from 1st hourly to current
+        res["current"]["pop"] = res["hourly"][0]["pop"]
 
         # parse current
         self.data["current"] = parse(res["current"])

@@ -106,7 +106,9 @@
                 />
               </td>
               <td>
-                {{data.weather.current.precip}} {{data.weather.units.precip}}
+                {{data.weather.forecast[2].precip}}
+                {{data.weather.units.precip}} |
+                {{data.weather.forecast[2].precip_percent}}%
               </td>
             </tr>
           </table>
