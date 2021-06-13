@@ -108,7 +108,7 @@ class Loop:
 
             # write data to state
             self.data.update("weather", self.weather.data)
-            self.data.update("updated", f"Last Updated: {self.webTime.timestamp}")
+            self.data.update("updated", self.webTime.timestamp)
             self.data.update(
                 "transit",
                 f"Transit/Traffic Alerts: {', '.join(self.transit.data) or None}",

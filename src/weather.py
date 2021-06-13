@@ -92,7 +92,7 @@ class Weather:
                 "wind": wind,
                 "precip": round(sum(d["rain"].values()) + sum(d["snow"].values()), 1),
                 "dt": date.strftime("%a %d %b"),
-                "hour": date.strftime("%I:%M %p"),
+                "hour": date.strftime("%-I %p"),
                 "precip_percent": round(d["pop"] * 100),
                 "iconPath": iconMapper(d["weather"][0]["icon"]),
             }
@@ -106,7 +106,7 @@ class Weather:
 
         # parse current
         self.data["current"] = parse(res["current"])
-        self.data["location"] = f"Location: {self.name}"
+        self.data["location"] = self.name
 
         # parse forecast
         forecast = []
