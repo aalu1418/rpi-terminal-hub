@@ -84,7 +84,6 @@
         </th>
       </tr>
       <tr>
-        <td>{{data.weather.current.condition}}</td>
         <td>
           <table id="currently" class="no-wrap">
             <tr>
@@ -96,6 +95,35 @@
               </td>
             </tr>
             <tr>
+              <td><img class="small-icon" src="/static/wi-humidity.png" /></td>
+              <td>{{data.weather.current.humidity}}%</td>
+            </tr>
+            <tr>
+              <td>
+                <img class="small-icon" src="/static/wi-day-sunny.png" />
+              </td>
+              <td>UVI: {{data.weather.current.uvi}}</td>
+            </tr>
+            <tr>
+              <td>
+                <img class="small-icon" src="/static/wi-cloudy.png" />
+              </td>
+              <td>{{data.weather.current.clouds}}%</td>
+            </tr>
+          </table>
+        </td>
+        <td>
+          <table id="currently" class="no-wrap">
+            <tr>
+              <td>
+                <img class="small-icon" src="/static/wi-raindrops.png" />
+              </td>
+              <td>
+                {{data.weather.current.precip}} {{data.weather.units.precip}} |
+                {{data.weather.current.precip_percent}}%
+              </td>
+            </tr>
+            <tr>
               <td>
                 <img class="small-icon" src="/static/wi-strong-wind.png" />
               </td>
@@ -104,18 +132,14 @@
               </td>
             </tr>
             <tr>
-              <td><img class="small-icon" src="/static/wi-humidity.png" /></td>
-              <td>{{data.weather.current.humidity}}%</td>
+              <td><img class="small-icon" src="/static/wi-sunrise.png" /></td>
+              <td>{{data.weather.current.sunrise}}</td>
             </tr>
             <tr>
               <td>
-                <img class="small-icon" src="/static/wi-raindrops.png" />
+                <img class="small-icon" src="/static/wi-sunset.png" />
               </td>
-              <td>
-                {{data.weather.forecast[2].precip}}
-                {{data.weather.units.precip}} |
-                {{data.weather.forecast[2].precip_percent}}%
-              </td>
+              <td>{{data.weather.current.sunset}}</td>
             </tr>
           </table>
         </td>

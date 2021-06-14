@@ -83,7 +83,7 @@ class Weather:
                 else round(d["wind_speed"] * factor)
             )
 
-            return {
+            output = {
                 "condition": d["weather"][0]["description"].title(),
                 "temp": round(d["temp"]),
                 "temp_feel": d["feels_like"],
@@ -95,7 +95,20 @@ class Weather:
                 "hour": date.strftime("%-I %p"),
                 "precip_percent": round(d["pop"] * 100),
                 "iconPath": iconMapper(d["weather"][0]["icon"]),
+                "uvi": d["uvi"],
+                "clouds": d["clouds"],
             }
+
+            # add sunrise/sunset time if present
+            if "sunrise" in d.keys() and "sunset" in d.keys():
+                output["sunrise"] = datetime.fromtimestamp(d["sunrise"]).strftime(
+                    "%-I:%M %p"
+                )
+                output["sunset"] = datetime.fromtimestamp(d["sunset"]).strftime(
+                    "%-I:%M %p"
+                )
+
+            return output
 
         # fetch onecall
         res = requests.get("https://api.openweathermap.org/data/2.5/onecall" + query)
