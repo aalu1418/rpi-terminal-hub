@@ -10,6 +10,9 @@ options = {"toronto, on": ttc.TTC}
 class Transit:
     def __init__(self, location):
         # import module
+        if location.lower() not in options:
+            options[location.lower()] = null.NULL
+
         self.submodule = options[location.lower()]()
 
     def fetch(self):
