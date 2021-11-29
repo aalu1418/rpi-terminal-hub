@@ -55,7 +55,7 @@ class Weather:
 
         # units
         if self.location["units"] == "imperial":
-            units = {"temp": "F", "precip": "mm", "speed": "mph"}
+            units = {"temp": "F", "precip": "in", "speed": "mph"}
         else:
             units = {"temp": "C", "precip": "mm", "speed": "km/h"}
 
