@@ -117,6 +117,9 @@ class Weather:
         # add POP from 1st hourly to current
         res["current"]["pop"] = res["hourly"][0]["pop"]
 
+        # add feels_like from 1st hourly to current
+        res["current"]["feels_like"] = res["hourly"][0]["feels_like"]
+
         # parse current
         self.data["current"] = parse(res["current"])
         self.data["location"] = self.name
