@@ -7,7 +7,7 @@ except Exception as e:
 options = {"toronto, on": ttc.TTC}
 
 
-class Transit:
+class Alerts:
     def __init__(self, location):
         # import module
         if location.lower() not in options:
@@ -22,6 +22,6 @@ class Transit:
 
 
 if __name__ == "__main__":
-    transit = Transit("toronto, on")
-    transit.fetch()
-    print(transit.data)
+    alerts = Alerts("toronto, on")
+    alerts.fetch()
+    print(alerts.data)

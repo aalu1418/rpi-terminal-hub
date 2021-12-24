@@ -1,7 +1,7 @@
 # custom modules
 from src.webTime import WebTime
 from src.weather import Weather, clear
-from src.transit import Transit
+from src.alerts import Alerts
 from src.state import State
 from src.utils import Cmd, getData
 
@@ -40,7 +40,7 @@ class Loop:
             self.eufy = Eufy(filename=filename)
         self.webTime = WebTime()
         self.weather = Weather(locations, location)
-        self.transit = Transit(location or list(locations.keys())[0])
+        self.transit = Alerts(location or list(locations.keys())[0])
 
         self.retry = False
         self.increment = increment
@@ -110,8 +110,8 @@ class Loop:
             self.data.update("weather", self.weather.data)
             self.data.update("updated", self.webTime.timestamp)
             self.data.update(
-                "transit",
-                f"Transit/Traffic Alerts: {', '.join(self.transit.data) or None}",
+                "alerts",
+                f"Alerts: {', '.join(self.transit.data) or None}",
             )
 
             self.retry = False
