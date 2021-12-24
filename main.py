@@ -40,7 +40,7 @@ class Loop:
             self.eufy = Eufy(filename=filename)
         self.webTime = WebTime()
         self.weather = Weather(locations, location)
-        self.transit = Alerts(location or list(locations.keys())[0])
+        self.alerts = Alerts(location or list(locations.keys())[0])
 
         self.retry = False
         self.increment = increment
@@ -104,14 +104,14 @@ class Loop:
             # fetch data
             self.weather.fetch()
             self.webTime.fetch()
-            self.transit.fetch()
+            self.alerts.fetch()
 
             # write data to state
             self.data.update("weather", self.weather.data)
             self.data.update("updated", self.webTime.timestamp)
             self.data.update(
                 "alerts",
-                f"Alerts: {', '.join(self.transit.data) or None}",
+                f"Alerts: {', '.join(self.alerts.data) or None}",
             )
 
             self.retry = False

@@ -1,10 +1,10 @@
 # accomodates different usage scopes for modules
 try:
-    from modules import *  # scope for running transit.py directly
+    from modules import *  # scope for running alerts.py directly
 except Exception as e:
-    from src.modules import *  # scope for running transit in main.py
+    from src.modules import *  # scope for running alerts in main.py
 
-options = {"toronto, on": ttc.TTC}
+options = {"toronto, on": ttc.TTC, "ann arbor, mi": noaa.NOAA}
 
 
 class Alerts:
