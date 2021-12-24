@@ -5,6 +5,7 @@ class NOAA:
     def __init__(self):
         # self.url = "https://alerts.weather.gov/cap/wwaatmget.php?x=COC069&y=0"
         self.url = "https://alerts.weather.gov/cap/wwaatmget.php?x=MIC161&y=0"
+        self.name = "NOAA"
 
     def fetch(self):
         self.data = feedparser.parse(self.url)

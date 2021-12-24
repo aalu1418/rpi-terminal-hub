@@ -111,7 +111,7 @@ class Loop:
             self.data.update("updated", self.webTime.timestamp)
             self.data.update(
                 "alerts",
-                f"Alerts: {', '.join(self.alerts.data) or None}",
+                f"Alerts{' ['+self.alerts.name+']' if self.alerts.name != '' else self.alerts.name}: {', '.join(self.alerts.data) or None}",
             )
 
             self.retry = False

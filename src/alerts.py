@@ -14,6 +14,7 @@ class Alerts:
             options[location.lower()] = null.NULL
 
         self.submodule = options[location.lower()]()
+        self.name = self.submodule.name
 
     def fetch(self):
         # fetch in submodule and pass back data

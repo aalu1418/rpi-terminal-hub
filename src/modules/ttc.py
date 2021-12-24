@@ -4,6 +4,7 @@ import requests, re, feedparser
 class TTC:
     def __init__(self):
         self.url = "http://ttc.ca/RSS/Service_Alerts/index.rss"
+        self.name = "TTC"
 
     def fetch(self):
         self.data = feedparser.parse(self.url)
