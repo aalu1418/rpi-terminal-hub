@@ -4,6 +4,7 @@ import requests, re, feedparser
 class NULL:
     def fetch(self):
         self.data = ["N/A"]
+        self.name = ""
 
 
 if __name__ == "__main__":
