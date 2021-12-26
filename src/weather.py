@@ -114,11 +114,8 @@ class Weather:
         res = requests.get("https://api.openweathermap.org/data/2.5/onecall" + query)
         res = res.json()
 
-        # add POP from 1st hourly to current
-        res["current"]["pop"] = res["hourly"][0]["pop"]
-
-        # add feels_like from 1st hourly to current
-        res["current"]["feels_like"] = res["hourly"][0]["feels_like"]
+        # current not always accurate, replace with first hourly (keeps params hourly is missing)
+        res["current"].update(res["hourly"][0])
 
         # parse current
         self.data["current"] = parse(res["current"])
