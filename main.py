@@ -126,7 +126,7 @@ class Loop:
 
             # run vacuum checks
             if hasattr(self, "eufy") and self.scheduler():
-                self.eufy.emit("start_stop")
+                self.eufy.emit("30min")
             self.data.update(
                 "eufy",
                 f"Eufy Status: {self.eufy.print() if hasattr(self, 'eufy') else 'N/A'}",

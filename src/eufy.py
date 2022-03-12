@@ -9,7 +9,7 @@ states = {0: None, 1: "Scheduled", 2: "Started", 3: "Completed"}
 class Eufy:
     def __init__(self, filename=None, emitter=None, receiver=None):
         self.status = 0
-        self.commands = ["start_stop", "home", "circle", "edge", "auto"]
+        self.commands = ["start_stop", "home", "circle", "edge", "auto", "30min"]
         if filename is not None:
             self.controller = CommandSet.load(filename)
         elif emitter is not None and receiver is not None:
@@ -28,7 +28,7 @@ class Eufy:
         self.controller.save_as("eufy.json")
 
     def emit(self, v):
-        if v == "start_stop":
+        if v == "start_stop" or v == "30min":
             self.status = 2
         self.controller.emit(v)
 
