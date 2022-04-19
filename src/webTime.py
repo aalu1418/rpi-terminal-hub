@@ -5,6 +5,8 @@ import requests
 class WebTime:
     def __init__(self, timezone="est"):
         self.url = f"http://worldclockapi.com/api/json/{timezone}/now"
+        self.minute = 0
+        self.hour = 0
 
     def fetch(self):
         res = requests.get(self.url)

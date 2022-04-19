@@ -17,7 +17,8 @@ from multiprocessing import Process, Queue
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
-app.output_data = "Hello, World"  # storing data for output
+app.output_data = "Server is starting... "  # storing data for output
+wifi_down = "ERROR: failed to fetch data [wifi may be down]"
 
 # ------ MAIN LOOP ------------
 class Loop:
@@ -170,6 +171,10 @@ if __name__ == "__main__":
         # return initial string if data is not loaded
         if type(app.output_data) is str:
             return app.output_data
+
+        if "weather" not in app.output_data:
+            print("ERROR: failed no data to return")
+            return wifi_down
 
         # return app.output_data
         return render_template("index.html", data=app.output_data)

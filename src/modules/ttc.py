@@ -1,4 +1,4 @@
-import requests, re, feedparser
+import re, feedparser
 
 # module for toronto transit commission
 class TTC:
