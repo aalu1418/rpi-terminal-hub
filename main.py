@@ -189,7 +189,7 @@ if __name__ == "__main__":
     def vacuum():
         if eufy:
             eufyInterface = Eufy(filename="/home/pi/rpi-terminal-hub/data/eufy.json")
-            cmd = request.form.get("cmd").lower()
+            cmd = request.form.get("cmd")
             if cmd == "start" or cmd == "stop" or cmd not in eufyInterface.commands:
                 cmd = "start_stop"
 
