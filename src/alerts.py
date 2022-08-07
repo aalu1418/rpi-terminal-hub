@@ -4,14 +4,17 @@ try:
 except Exception as e:
     from src.modules import *  # scope for running alerts in main.py
 
-options = {"toronto, on": ttc.TTC, "ann arbor, mi": noaa.NOAA}
+options = {
+    "toronto, on": ttc.TTC,
+    "null, null": null.NULL,
+}
 
 
 class Alerts:
     def __init__(self, location):
-        # import module
+        # default to NOAA
         if location.lower() not in options:
-            options[location.lower()] = null.NULL
+            options[location.lower()] = noaa.NOAA
 
         self.submodule = options[location.lower()]()
         self.name = self.submodule.name

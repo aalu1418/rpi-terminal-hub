@@ -1,10 +1,12 @@
 import requests, re, feedparser
 
-# module for toronto transit commission
+# null module for alerts
 class NULL:
+    def __init__(self):
+        self.name = ""
+
     def fetch(self):
         self.data = ["N/A"]
-        self.name = ""
 
 
 if __name__ == "__main__":
