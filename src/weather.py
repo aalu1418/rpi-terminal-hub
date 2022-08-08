@@ -40,13 +40,9 @@ def iconMapper(icon):
 
 
 class Weather:
-    def __init__(self, locations, location=None):
-        # use first location in json if key is not defined
-        if location == None or location not in locations:
-            location = list(locations.keys())[0]
-
-        self.name = location
-        self.location = locations[location]
+    def __init__(self, name, location_data):
+        self.name = name
+        self.location = location_data
         self.json = json
 
     def fetch(self):
@@ -132,7 +128,10 @@ if __name__ == "__main__":
     from utils import getData
 
     locations = getData("locations.json")
-    weather = Weather(locations)
+
+    name = list(locations.keys())[0]
+
+    weather = Weather(name, locations[name])
     clear()
     while True:
         weather.fetch()

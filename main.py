@@ -39,9 +39,15 @@ class Loop:
 
             self.startup()
             self.eufy = Eufy(filename=filename)
-        self.webTime = WebTime()
-        self.weather = Weather(locations, location)
-        self.alerts = Alerts(location or list(locations.keys())[0])
+
+        # parse location
+        if location == None or location not in locations:
+            location = list(locations.keys())[0]
+
+        location_data = locations[location]
+        self.webTime = WebTime(location_data["timezone"])
+        self.weather = Weather(location, location_data)
+        self.alerts = Alerts(location)
 
         self.retry = False
         self.increment = increment
