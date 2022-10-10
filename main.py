@@ -12,6 +12,8 @@ from time import time, sleep
 from datetime import datetime
 import os, sys, traceback, subprocess
 from multiprocessing import Process, Queue
+import requests
+from prometheus_client import Counter, generate_latest
 
 # flask server
 from flask import Flask, render_template, request
@@ -19,6 +21,9 @@ from flask import Flask, render_template, request
 app = Flask(__name__)
 app.output_data = "Server is starting... "  # storing data for output
 wifi_down = "ERROR: failed to fetch data [wifi may be down]"
+
+# Prometheus
+connection_alive = Counter("internet_alive", "Count of querying endpoint for aliveness")
 
 # ------ MAIN LOOP ------------
 class Loop:
@@ -108,14 +113,14 @@ class Loop:
     # fetch data with retry logic
     def fetch(self):
         try:
-            # fetch data
+            # fetch + write data
             self.weather.fetch()
-            self.webTime.fetch()
-            self.alerts.fetch()
-
-            # write data to state
             self.data.update("weather", self.weather.data)
+
+            self.webTime.fetch()
             self.data.update("updated", self.webTime.timestamp)
+
+            self.alerts.fetch()
             self.data.update(
                 "alerts",
                 f"Alerts{' ['+self.alerts.name+']' if self.alerts.name != '' else self.alerts.name}: {', '.join(self.alerts.data) or None}",
@@ -123,6 +128,7 @@ class Loop:
 
             self.retry = False
         except Exception as e:  # if error, retry in the next minute
+            print(e)
             self.retry = True
 
     def loop(self):
@@ -239,6 +245,17 @@ if __name__ == "__main__":
         for s in seq:
             subprocess.Popen(s, shell=True)
         return {"status": "ready for push"}
+
+    # increments each time endpoint is called
+    @app.route("/metrics")
+    def metrics():
+        try:
+            requests.get("http://1.1.1.1", timeout=1)
+            connection_alive.inc(1)
+        except Exception as e:
+            print("Monitoring:", e)
+
+        return generate_latest()
 
     app.run(host="0.0.0.0")
     p.join()

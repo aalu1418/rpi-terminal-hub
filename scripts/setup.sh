@@ -11,7 +11,7 @@ sudo apt-get install -y git python3-pip pigpio vim
 sudo timedatectl set-timezone America/New_York
 
 # install python packages
-pip3 install pigpio ircodec flask requests python-dotenv feedparser
+pip3 install pigpio ircodec flask requests python-dotenv feedparser prometheus-client
 
 # pull repo
 git clone https://github.com/aalu1418/rpi-terminal-hub
