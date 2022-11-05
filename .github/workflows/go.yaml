@@ -1,0 +1,23 @@
+name: golang
+
+on:
+  push:
+
+jobs:
+  tests:
+    name: go tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+      - name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: "go.mod"
+          check-latest: true
+      - name: build
+        run: go build -v ./...
+      - name: test
+        run: go test ./... -v
+      - name: test -race
+        run: go test ./... -v -race -count=10
