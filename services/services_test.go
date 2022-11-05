@@ -14,9 +14,11 @@ func TestServices(t *testing.T) {
 	deadline, _ := t.Deadline()
 	ctx, cancel := context.WithDeadline(context.Background(), deadline)
 	defer cancel()
+	output := make(chan types.Message)
+	defer close(output)
 
 	services := []types.Service{
-		base.XXXNewBaseImplementation(t, "base", func(types.Message) {}),
+		base.XXXNewBaseImplementation(t, output, "base", func(types.Message) {}),
 	}
 
 	for _, v := range services {
@@ -29,11 +31,8 @@ func TestServices(t *testing.T) {
 				require.Error(t, v.Start(ctx))
 			})
 			t.Run("channelClosure", func(t *testing.T) {
-				read, write := v.ExtRead(), v.ExtWrite()
+				write := v.ExtWrite()
 				require.NoError(t, v.Stop())
-
-				_, ok := <-read
-				require.False(t, ok)
 				require.PanicsWithError(t, "send on closed channel", func() { write <- types.Message{} })
 			})
 		})

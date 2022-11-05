@@ -28,7 +28,8 @@ func TestBase(t *testing.T) {
 		wg.Done()
 	}
 
-	s := XXXNewBaseImplementation(t, strings.ToUpper(name), processMsg)
+	output := make(chan types.Message)
+	s := XXXNewBaseImplementation(t, output, strings.ToUpper(name), processMsg)
 
 	// start without issue
 	assert.Equal(t, name, s.Name())
@@ -36,8 +37,7 @@ func TestBase(t *testing.T) {
 	assert.True(t, s.Healthy())
 
 	// check received message
-	read := s.ExtRead()
-	receivedMsg := <-read
+	receivedMsg := <-output
 	assert.Equal(t, name, receivedMsg.From)
 	assert.Equal(t, "placeholder", receivedMsg.To)
 	assert.Equal(t, "time.Time", fmt.Sprintf("%T", receivedMsg.Data))

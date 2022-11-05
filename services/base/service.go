@@ -15,8 +15,8 @@ import (
 type service struct {
 	name         string
 	started      bool
-	incomingMsg  chan types.Message
-	outgoingMsg  chan types.Message
+	incomingMsg  chan types.Message   // provided to messaging service to send data back
+	outgoingMsg  chan<- types.Message // provided externally by messaging service
 	wg           sync.WaitGroup
 	stop         chan struct{}
 	tickInterval time.Duration
@@ -24,12 +24,12 @@ type service struct {
 	processMsg   types.ProcessMsg
 }
 
-func New(name string, interval time.Duration, onTick types.OnTick, processMsg types.ProcessMsg) types.Service {
+func New(outgoingMsg chan<- types.Message, name string, interval time.Duration, onTick types.OnTick, processMsg types.ProcessMsg) types.Service {
 	return &service{
 		name:         strings.ToLower(name),
 		started:      false,
 		incomingMsg:  make(chan types.Message),
-		outgoingMsg:  make(chan types.Message),
+		outgoingMsg:  outgoingMsg,
 		wg:           sync.WaitGroup{},
 		stop:         make(chan struct{}),
 		tickInterval: interval,
@@ -57,10 +57,6 @@ func (s *service) Healthy() bool {
 	return s.started
 }
 
-func (s *service) ExtRead() <-chan types.Message {
-	return s.outgoingMsg
-}
-
 func (s *service) ExtWrite() chan<- types.Message {
 	return s.incomingMsg
 }
@@ -71,10 +67,8 @@ func (s *service) Stop() error {
 	}
 
 	close(s.stop)
-
 	s.wg.Wait()
 	close(s.incomingMsg)
-	close(s.outgoingMsg)
 	s.started = false
 	return nil
 }
@@ -105,7 +99,7 @@ func (s *service) run() {
 
 // XXXBaseImplementations for testing only
 // provides the needed interfaces to construct
-func XXXNewBaseImplementation(t *testing.T, name string, processMsg types.ProcessMsg) types.Service {
+func XXXNewBaseImplementation(t *testing.T, out chan<- types.Message, name string, processMsg types.ProcessMsg) types.Service {
 	duration := time.Second
 	onTick := func() types.Message {
 		return types.Message{
@@ -113,5 +107,5 @@ func XXXNewBaseImplementation(t *testing.T, name string, processMsg types.Proces
 			Data: time.Now(),
 		}
 	}
-	return New(name, duration, onTick, processMsg)
+	return New(out, name, duration, onTick, processMsg)
 }

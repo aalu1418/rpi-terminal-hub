@@ -2,13 +2,16 @@ package types
 
 import "context"
 
-type Service interface {
-	Name() string
+type BaseService interface {
 	Start(context.Context) error
-	Healthy() bool
-	ExtRead() <-chan Message  // channel for passing external messages to service
-	ExtWrite() chan<- Message // channel for passing messages to external services
 	Stop() error
+}
+
+type Service interface {
+	BaseService
+	Name() string
+	Healthy() bool
+	ExtWrite() chan<- Message // channel for passing messages to external services
 }
 
 type Message struct {
