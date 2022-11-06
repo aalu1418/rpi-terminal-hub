@@ -22,13 +22,13 @@ func newMockService(t *testing.T, incomingChan chan<- types.Message) types.Servi
 }
 
 func TestPostOffice(t *testing.T) {
-	messages := make(chan types.Message, types.MAX_QUEUE)
+	messages := types.NewQueue()
 	defer close(messages)
 
-	s0_msg := make(chan types.Message, types.MAX_QUEUE)
+	s0_msg := types.NewQueue()
 	defer close(s0_msg)
 	s0 := newMockService(t, s0_msg)
-	s1_msg := make(chan types.Message, types.MAX_QUEUE)
+	s1_msg := types.NewQueue()
 	defer close(s1_msg)
 	s1 := newMockService(t, s1_msg)
 

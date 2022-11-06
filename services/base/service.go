@@ -28,7 +28,7 @@ func New(outgoingMsg chan<- types.Message, name string, interval time.Duration, 
 	return &service{
 		name:         strings.ToLower(name),
 		started:      false,
-		incomingMsg:  make(chan types.Message, types.MAX_QUEUE),
+		incomingMsg:  types.NewQueue(),
 		outgoingMsg:  outgoingMsg,
 		wg:           sync.WaitGroup{},
 		stop:         make(chan struct{}),

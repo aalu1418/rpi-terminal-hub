@@ -27,3 +27,7 @@ type OnTick func() Message
 
 // ProcessMsg - handler run when a message in the base service is received
 type ProcessMsg func(Message)
+
+func NewQueue() chan Message {
+	return make(chan Message, MAX_QUEUE)
+}

@@ -14,7 +14,7 @@ func TestServices(t *testing.T) {
 	deadline, _ := t.Deadline()
 	ctx, cancel := context.WithDeadline(context.Background(), deadline)
 	defer cancel()
-	output := make(chan types.Message)
+	output := types.NewQueue()
 	defer close(output)
 
 	services := []types.Service{
