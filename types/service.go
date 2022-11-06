@@ -3,13 +3,14 @@ package types
 import "context"
 
 type BaseService interface {
+	Name() string
 	Start(context.Context) error
 	Stop() error
 }
 
+//go:generate mockery --name Service --output ./mocks/
 type Service interface {
 	BaseService
-	Name() string
 	Healthy() bool
 	ExtWrite() chan<- Message // channel for passing messages to external services
 }

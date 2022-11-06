@@ -28,7 +28,7 @@ func New(outgoingMsg chan<- types.Message, name string, interval time.Duration, 
 	return &service{
 		name:         strings.ToLower(name),
 		started:      false,
-		incomingMsg:  make(chan types.Message),
+		incomingMsg:  make(chan types.Message, types.MAX_QUEUE),
 		outgoingMsg:  outgoingMsg,
 		wg:           sync.WaitGroup{},
 		stop:         make(chan struct{}),
@@ -74,8 +74,7 @@ func (s *service) Stop() error {
 }
 
 func (s *service) run() {
-	tick := time.NewTicker(s.tickInterval)
-	defer tick.Stop()
+	tick := time.After(0)
 	defer s.wg.Done()
 
 	for {
@@ -89,9 +88,17 @@ func (s *service) run() {
 				continue // continue loop
 			}
 			s.processMsg(m)
-		case <-tick.C:
-			msg := s.onTick()
-			msg.From = s.name // always use name as from
+		case <-tick:
+			start := time.Now()                                   // track starting time
+			msg := s.onTick()                                     // run msg generating function
+			msg.From = s.name                                     // always use name as from
+			tick = time.After(s.tickInterval - time.Since(start)) // reset tick
+
+			// handle full outoing queue
+			if len(s.outgoingMsg) == types.MAX_QUEUE {
+				log.Errorf("[CRITICAL] outgoing message queu is full, msg dropped: %+v", msg)
+				continue
+			}
 			s.outgoingMsg <- msg
 		}
 	}
