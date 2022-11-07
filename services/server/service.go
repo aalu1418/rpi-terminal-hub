@@ -11,10 +11,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	NAME = "web-server"
-)
-
 func init() {
 	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		if _, err := w.Write([]byte("pong")); err != nil {
@@ -32,7 +28,7 @@ type service struct {
 
 func New(outgoingMsg chan<- types.Message) types.Service {
 	var s service
-	s.Service = base.New(outgoingMsg, NAME, types.INFINITE_TIME, s.onTick, s.processMsg)
+	s.Service = base.New(outgoingMsg, types.WEBSERVER, types.INFINITE_TIME, s.onTick, s.processMsg)
 	s.server = &http.Server{Addr: types.WEBSERVER_ADDRESS}
 	return &s
 }
@@ -67,6 +63,6 @@ func (s *service) processMsg(m types.Message) {
 func (s *service) onTick() types.Message {
 	return types.Message{
 		To:   types.POSTOFFICE,
-		Data: fmt.Sprintf("[ALIVE] %s", NAME),
+		Data: fmt.Sprintf("[ALIVE] %s", s.Name()),
 	}
 }

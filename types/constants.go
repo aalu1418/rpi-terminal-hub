@@ -13,5 +13,15 @@ const (
 	DEFAULT_TIMEOUT               = 5 * time.Second
 
 	// web server config
-	WEBSERVER_ADDRESS = ":5000"
+	WEBSERVER         = "web-server"
+	WEBSERVER_ADDRESS = "0.0.0.0:5000"
+
+	// metrics config
+	METRICS = "metrics-handler"
+
+	// connectivity config
+	CONNECTIVITY   = "internet-connectivity"
+	CONN_FREQUENCY = 5 * time.Second  // frequency of polling
+	CONN_TIMEOUT   = 1 * time.Second  // timeout for request
+	CONN_URL       = "http://1.1.1.1" // endpoint to ping
 )

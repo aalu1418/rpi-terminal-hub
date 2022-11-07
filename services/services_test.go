@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/aalu1418/rpi-terminal-hub/services/base"
+	"github.com/aalu1418/rpi-terminal-hub/services/connectivity"
 	"github.com/aalu1418/rpi-terminal-hub/services/metrics"
 	"github.com/aalu1418/rpi-terminal-hub/services/server"
 	"github.com/aalu1418/rpi-terminal-hub/types"
@@ -23,6 +24,7 @@ func TestServices(t *testing.T) {
 		base.XXXNewBaseImplementation(t, output, "base", func(types.Message) {}),
 		server.New(output),
 		metrics.New(output),
+		connectivity.New(output),
 	}
 
 	for _, v := range services {
