@@ -4,15 +4,12 @@ import (
 	"context"
 	"os"
 	"os/signal"
-	"time"
+	"strings"
 
 	"github.com/aalu1418/rpi-terminal-hub/services"
+	"github.com/aalu1418/rpi-terminal-hub/services/server"
 	"github.com/aalu1418/rpi-terminal-hub/types"
 	log "github.com/sirupsen/logrus"
-)
-
-const (
-	TIMEOUT = 5 * time.Second
 )
 
 func main() {
@@ -27,7 +24,9 @@ func main() {
 	defer close(messages)
 
 	// start up services
-	clients := []types.Service{}
+	clients := []types.Service{
+		server.New(messages),
+	}
 
 	// start up post office for message sorting
 	postOffice := services.NewPostOffice(messages, clients)
@@ -40,12 +39,18 @@ func main() {
 
 	// start up all services
 	for i := range startStop {
-		startCtx, cancel := context.WithTimeout(ctx, TIMEOUT)
+		startCtx, cancel := context.WithTimeout(ctx, types.DEFAULT_TIMEOUT)
 		if err := startStop[i].Start(startCtx); err != nil {
-			log.Fatalf("service (%s) failed to start: %s", startStop[i].Name(), err)
+			log.Panicf("service (%s) failed to start: %s", startStop[i].Name(), err)
 		}
 		cancel()
 	}
+
+	var names []string
+	for i := range clients {
+		names = append(names, clients[i].Name())
+	}
+	log.Infof("all services started: %s", strings.Join(names, ","))
 
 	// wait for exit system to interrupt
 	<-system
@@ -54,9 +59,11 @@ func main() {
 	// stop all clients
 	// stop post office first to avoid sending on closed channel
 	for i := range startStop {
-		if err := startStop[i].Stop(); err != nil {
+		stopCtx, cancel := context.WithTimeout(ctx, types.DEFAULT_TIMEOUT)
+		if err := startStop[i].Stop(stopCtx); err != nil {
 			log.Warnf("service (%s) failed to stop properly: %s", startStop[i].Name(), err)
 		}
+		cancel()
 	}
 
 	log.Info("all services shut down")

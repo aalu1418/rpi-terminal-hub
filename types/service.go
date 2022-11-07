@@ -5,7 +5,7 @@ import "context"
 type BaseService interface {
 	Name() string
 	Start(context.Context) error
-	Stop() error
+	Stop(context.Context) error
 }
 
 //go:generate mockery --name Service --output ./mocks/

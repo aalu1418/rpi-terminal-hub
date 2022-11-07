@@ -29,6 +29,11 @@ func NewPostOffice(incoming <-chan types.Message, clients []types.Service) types
 	// create mailboxes
 	for i := range clients {
 		address := strings.ToLower(clients[i].Name())
+
+		if _, exists := m.mailboxes[address]; exists {
+			log.Panicf("duplicate service names: %s", address)
+		}
+
 		m.mailboxes[address] = clients[i].ExtWrite()
 	}
 
@@ -74,6 +79,13 @@ func (m *postOffice) worker(msg types.Message) {
 		log.Errorf("post office received invalid message: %+v", msg)
 		return
 	}
+
+	// handle msg if sent to post office
+	if msg.To == types.POSTOFFICE {
+		log.Infof("post office recieved: %+v", msg)
+		return
+	}
+
 	mailbox, exists := m.mailboxes[msg.To]
 	if !exists {
 		log.Errorf("no valid mailbox for addressee: %+v", msg)
@@ -88,7 +100,7 @@ func (m *postOffice) worker(msg types.Message) {
 	mailbox <- msg
 }
 
-func (m *postOffice) Stop() error {
+func (m *postOffice) Stop(_ context.Context) error {
 	if !m.started {
 		return fmt.Errorf("post office has not been started")
 	}

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/aalu1418/rpi-terminal-hub/services/base"
+	"github.com/aalu1418/rpi-terminal-hub/services/server"
 	"github.com/aalu1418/rpi-terminal-hub/types"
 	"github.com/stretchr/testify/require"
 )
@@ -19,12 +20,13 @@ func TestServices(t *testing.T) {
 
 	services := []types.Service{
 		base.XXXNewBaseImplementation(t, output, "base", func(types.Message) {}),
+		server.New(output),
 	}
 
 	for _, v := range services {
 		t.Run(v.Name(), func(t *testing.T) {
 			t.Run("stopWithoutStart", func(t *testing.T) {
-				require.Error(t, v.Stop())
+				require.Error(t, v.Stop(context.Background()))
 			})
 			t.Run("doubleStart", func(t *testing.T) {
 				require.NoError(t, v.Start(ctx))
@@ -32,7 +34,7 @@ func TestServices(t *testing.T) {
 			})
 			t.Run("channelClosure", func(t *testing.T) {
 				write := v.ExtWrite()
-				require.NoError(t, v.Stop())
+				require.NoError(t, v.Stop(context.Background()))
 				require.PanicsWithError(t, "send on closed channel", func() { write <- types.Message{} })
 			})
 		})

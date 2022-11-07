@@ -48,6 +48,6 @@ func TestBase(t *testing.T) {
 	write <- msg
 	wg.Wait()
 
-	require.NoError(t, s.Stop())
+	require.NoError(t, s.Stop(context.Background()))
 	assert.False(t, s.Healthy())
 }

@@ -86,6 +86,15 @@ func TestPostOffice(t *testing.T) {
 		assertEmptyQueues(t)
 	})
 
+	t.Run("postofficeMsg", func(t *testing.T) {
+		messages <- types.Message{
+			From: s0.Name(),
+			To:   types.POSTOFFICE,
+			Data: "hello, world!",
+		}
+		assertEmptyQueues(t)
+	})
+
 	// multiple workers and dropping messages to handle too many messages
 	t.Run("maxQueueMaxWorkers", func(t *testing.T) {
 		totalMsgs := types.MAX_QUEUE * 2
@@ -122,7 +131,7 @@ func TestPostOffice(t *testing.T) {
 	})
 
 	t.Run("stop", func(t *testing.T) {
-		require.NoError(t, po.Stop())
+		require.NoError(t, po.Stop(context.Background()))
 
 		// sent messages don't reach services
 		messages <- types.Message{}
@@ -130,5 +139,9 @@ func TestPostOffice(t *testing.T) {
 		assert.Equal(t, 1, len(messages))
 		assert.Equal(t, 0, len(s0_msg))
 		assert.Equal(t, 0, len(s1_msg))
+	})
+
+	t.Run("duplicateServices", func(t *testing.T) {
+		assert.Panics(t, func() { NewPostOffice(messages, []types.Service{s0, s0}) })
 	})
 }

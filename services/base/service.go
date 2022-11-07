@@ -61,7 +61,7 @@ func (s *service) ExtWrite() chan<- types.Message {
 	return s.incomingMsg
 }
 
-func (s *service) Stop() error {
+func (s *service) Stop(_ context.Context) error {
 	if !s.started {
 		return fmt.Errorf("service not started")
 	}
