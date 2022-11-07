@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/aalu1418/rpi-terminal-hub/services/base"
+	"github.com/aalu1418/rpi-terminal-hub/services/metrics"
 	"github.com/aalu1418/rpi-terminal-hub/services/server"
 	"github.com/aalu1418/rpi-terminal-hub/types"
 	"github.com/stretchr/testify/require"
@@ -21,6 +22,7 @@ func TestServices(t *testing.T) {
 	services := []types.Service{
 		base.XXXNewBaseImplementation(t, output, "base", func(types.Message) {}),
 		server.New(output),
+		metrics.New(output),
 	}
 
 	for _, v := range services {

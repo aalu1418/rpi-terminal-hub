@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/aalu1418/rpi-terminal-hub/services"
+	"github.com/aalu1418/rpi-terminal-hub/services/metrics"
 	"github.com/aalu1418/rpi-terminal-hub/services/server"
 	"github.com/aalu1418/rpi-terminal-hub/types"
 	log "github.com/sirupsen/logrus"
@@ -26,6 +27,7 @@ func main() {
 	// start up services
 	clients := []types.Service{
 		server.New(messages),
+		metrics.New(messages),
 	}
 
 	// start up post office for message sorting

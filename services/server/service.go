@@ -7,6 +7,7 @@ import (
 
 	"github.com/aalu1418/rpi-terminal-hub/services/base"
 	"github.com/aalu1418/rpi-terminal-hub/types"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -16,26 +17,27 @@ const (
 
 func init() {
 	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("pong"))
+		if _, err := w.Write([]byte("pong")); err != nil {
+			log.Errorf("server.ping: %s", err)
+		}
 	})
+
+	http.Handle("/metrics", promhttp.Handler())
 }
 
 type service struct {
-	base   types.Service
+	types.Service
 	server *http.Server
 }
 
 func New(outgoingMsg chan<- types.Message) types.Service {
 	var s service
-	s.base = base.New(outgoingMsg, NAME, types.INFINITE_TIME, s.onTick, s.processMsg)
+	s.Service = base.New(outgoingMsg, NAME, types.INFINITE_TIME, s.onTick, s.processMsg)
 	s.server = &http.Server{Addr: types.WEBSERVER_ADDRESS}
 	return &s
 }
 
-func (s *service) Name() string {
-	return s.base.Name()
-}
-
+// custom Start
 func (s *service) Start(ctx context.Context) error {
 	// start server in go routine
 	go func() {
@@ -45,23 +47,16 @@ func (s *service) Start(ctx context.Context) error {
 		}
 	}()
 
-	return s.base.Start(ctx)
+	return s.Service.Start(ctx)
 }
 
-func (s *service) Healthy() bool {
-	return s.base.Healthy()
-}
-
-func (s *service) ExtWrite() chan<- types.Message {
-	return s.base.ExtWrite()
-}
-
+// custom Stop
 func (s *service) Stop(ctx context.Context) error {
 	if err := s.server.Shutdown(ctx); err != nil {
 		return err
 	}
 
-	return s.base.Stop(ctx)
+	return s.Service.Stop(ctx)
 }
 
 func (s *service) processMsg(m types.Message) {
