@@ -17,10 +17,11 @@ func TestMetrics_ProcessMsg(t *testing.T) {
 	s.Service = base
 
 	t.Run("unexpectedFrom", func(t *testing.T) {
+		init := testutil.ToFloat64(internetAlive)
 		s.processMsg(types.Message{
 			From: "unexpected",
 		})
-		require.Equal(t, float64(0), testutil.ToFloat64(internetAlive))
+		require.Equal(t, init, testutil.ToFloat64(internetAlive))
 	})
 
 	t.Run(types.CONNECTIVITY, func(t *testing.T) {
