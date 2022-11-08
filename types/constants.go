@@ -24,4 +24,10 @@ const (
 	CONN_FREQUENCY = 5 * time.Second  // frequency of polling
 	CONN_TIMEOUT   = 1 * time.Second  // timeout for request
 	CONN_URL       = "http://1.1.1.1" // endpoint to ping
+
+	// weather config
+	WEATHER           = "weather"
+	WEATHER_FREQUENCY = 15 * time.Minute
+	WEATHER_LAT       = "39.86506214649686"
+	WEATHER_LON       = "-105.04846274505923"
 )
