@@ -82,7 +82,7 @@ func (m *postOffice) worker(msg types.Message) {
 
 	// handle msg if sent to post office
 	if msg.To == types.POSTOFFICE {
-		log.Infof("post office recieved: %+v", msg)
+		log.Infof("[POSTOFFICE] log: %+v", msg)
 		return
 	}
 

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 
 	"github.com/aalu1418/rpi-terminal-hub/services/base"
 	"github.com/aalu1418/rpi-terminal-hub/types"
@@ -18,21 +17,14 @@ type service struct {
 	url    string
 }
 
-// TODO: remove, pass as flag
-var KEY string
-
-func init() {
-	KEY = os.Getenv("OWM_KEY")
-}
-
 // provides a single handler for setting & incrementing metrics
-func New(outgoingMsg chan<- types.Message) types.Service {
+func New(outgoingMsg chan<- types.Message, key string) types.Service {
 	var s service
 	s.Service = base.New(outgoingMsg, types.WEATHER, types.WEATHER_FREQUENCY, s.onTick, s.processMsg)
 	s.client = &http.Client{
 		Timeout: types.DEFAULT_TIMEOUT,
 	}
-	s.url = queryBuilder(types.WEATHER_LON, types.WEATHER_LAT, KEY)
+	s.url = queryBuilder(types.WEATHER_LON, types.WEATHER_LAT, key)
 	return &s
 }
 
@@ -43,26 +35,32 @@ func (s *service) processMsg(m types.Message) {
 // poll & send message to metrics service
 func (s *service) onTick() (msg types.Message) {
 	msg = types.Message{
-		To:   types.WEBSERVER,
-		Data: nil,
+		To: types.POSTOFFICE,
 	}
 
 	res, err := s.client.Get(s.url)
 	if err != nil || res == nil || res.StatusCode != 200 {
-		log.Errorf("failed to fetch weather: %+v, %s", res, err)
+		msg.Data = map[string]interface{}{
+			"err": err,
+			"res": res,
+		}
+		return msg
 	}
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Errorf("failed to read response body: %s", err)
+		msg.Data = err
+		return msg
 	}
 	var data types.OneCall
 	if err := json.Unmarshal(body, &data); err != nil {
-		log.Errorf("failed to unmarshal response body: %s", err)
+		msg.Data = err
+		return msg
 	}
 
-	fmt.Printf("%+v\n", data)
-
-	return msg
+	return types.Message{
+		To:   types.WEBSERVER,
+		Data: Parser(data),
+	}
 }
 
 func queryBuilder(lon, lat, key string) string {
