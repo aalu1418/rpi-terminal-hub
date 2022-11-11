@@ -1,13 +1,18 @@
+//go:build !race
+
+// skip race test - http handlers cannot be deregistered
 package services
 
 import (
 	"context"
 	"testing"
 
+	"github.com/aalu1418/rpi-terminal-hub/services/alerts"
 	"github.com/aalu1418/rpi-terminal-hub/services/base"
 	"github.com/aalu1418/rpi-terminal-hub/services/connectivity"
 	"github.com/aalu1418/rpi-terminal-hub/services/metrics"
 	"github.com/aalu1418/rpi-terminal-hub/services/server"
+	"github.com/aalu1418/rpi-terminal-hub/services/weather"
 	"github.com/aalu1418/rpi-terminal-hub/types"
 	"github.com/stretchr/testify/require"
 )
@@ -25,6 +30,8 @@ func TestServices(t *testing.T) {
 		server.New(output),
 		metrics.New(output),
 		connectivity.New(output),
+		weather.New(output, ""),
+		alerts.NewNWS(output),
 	}
 
 	for _, v := range services {
