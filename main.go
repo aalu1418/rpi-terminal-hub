@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"flag"
 	"os"
 	"os/signal"
 	"strings"
 
 	"github.com/aalu1418/rpi-terminal-hub/services"
+	"github.com/aalu1418/rpi-terminal-hub/services/alerts"
 	"github.com/aalu1418/rpi-terminal-hub/services/connectivity"
 	"github.com/aalu1418/rpi-terminal-hub/services/metrics"
 	"github.com/aalu1418/rpi-terminal-hub/services/server"
@@ -15,10 +17,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var OWMKey string
+var (
+	OWMKey string
+)
 
 func init() {
-	OWMKey = os.Getenv("OWM_KEY")
+	flag.StringVar(&OWMKey, "owm", os.Getenv(types.OWM_ENVVAR), "pass in openweathermap api key")
+	flag.Parse()
+	if OWMKey == "" {
+		log.Fatalf("missing openweathermap api key - pass via %s env or --owm flag", types.OWM_ENVVAR)
+	}
 }
 
 func main() {
@@ -38,6 +46,7 @@ func main() {
 		metrics.New(messages),
 		connectivity.New(messages),
 		weather.New(messages, OWMKey),
+		alerts.NewNWS(messages),
 	}
 
 	// start up post office for message sorting

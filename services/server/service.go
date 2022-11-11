@@ -40,6 +40,7 @@ type service struct {
 
 type outputData struct {
 	Weather types.WeatherParsed
+	Alerts  string
 }
 
 func New(outgoingMsg chan<- types.Message) types.Service {
@@ -91,7 +92,8 @@ func (s *service) processMsg(m types.Message) {
 		return
 	}
 
-	if m.From == types.WEATHER {
+	switch {
+	case m.From == types.WEATHER:
 		weatherData, ok := m.Data.(types.WeatherParsed)
 		if !ok {
 			log.Errorf("[SERVER] could not parse weather message: %+v", m)
@@ -101,6 +103,17 @@ func (s *service) processMsg(m types.Message) {
 		defer s.lock.Unlock()
 		s.data.Weather = weatherData
 		return
+	case m.From == types.NWS:
+		alert, ok := m.Data.(string)
+		if !ok {
+			log.Errorf("[SERVER] could not parse NWS alert message: %+v", m)
+		}
+		s.lock.Lock()
+		defer s.lock.Unlock()
+		s.data.Alerts = alert
+		return
+	default:
+		log.Infof("[SERVER] received: %+v", m)
 	}
 }
 
