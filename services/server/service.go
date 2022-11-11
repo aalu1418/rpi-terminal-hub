@@ -41,6 +41,10 @@ func New(outgoingMsg chan<- types.Message) types.Service {
 
 // custom Start
 func (s *service) Start(ctx context.Context) error {
+	if err := s.Service.Start(ctx); err != nil {
+		return err
+	}
+
 	http.HandleFunc("/ping", func(w http.ResponseWriter, _ *http.Request) {
 		if _, err := w.Write([]byte("pong")); err != nil {
 			log.Errorf("server.ping: %s", err)
@@ -66,7 +70,7 @@ func (s *service) Start(ctx context.Context) error {
 		}
 	}()
 
-	return s.Service.Start(ctx)
+	return nil
 }
 
 // custom Stop
