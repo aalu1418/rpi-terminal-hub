@@ -18,6 +18,18 @@ import (
 //go:embed static index.html
 var static embed.FS
 
+func init() {
+	http.HandleFunc("/ping", func(w http.ResponseWriter, _ *http.Request) {
+		if _, err := w.Write([]byte("pong")); err != nil {
+			log.Errorf("server.ping: %s", err)
+		}
+	})
+
+	http.Handle("/metrics", promhttp.Handler())
+
+	http.Handle("/static/", http.FileServer(http.FS(static)))
+}
+
 type service struct {
 	types.Service
 	server   *http.Server
@@ -45,15 +57,6 @@ func (s *service) Start(ctx context.Context) error {
 		return err
 	}
 
-	http.HandleFunc("/ping", func(w http.ResponseWriter, _ *http.Request) {
-		if _, err := w.Write([]byte("pong")); err != nil {
-			log.Errorf("server.ping: %s", err)
-		}
-	})
-
-	http.Handle("/metrics", promhttp.Handler())
-
-	http.Handle("/static/", http.FileServer(http.FS(static)))
 	http.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
 		s.lock.RLock()
 		defer s.lock.RUnlock()
