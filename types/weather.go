@@ -31,7 +31,8 @@ type Weather struct {
 }
 
 type Precipitation struct {
-	OneHour float64 `json:"1h,omitempty"`
+	OneHour   float64 `json:"1h,omitempty"`
+	ThreeHour float64 `json:"3h,omitempty"`
 }
 
 type Details struct {
@@ -44,6 +45,7 @@ type Details struct {
 type WeatherParsed struct {
 	Date        string
 	LastUpdated string
+	Location    string
 	Current     WeatherParsedStatus
 	Hourly      [4]WeatherParsedStatus
 }
@@ -60,13 +62,14 @@ type WeatherParsedStatus struct {
 	Hour         string
 	Icon         string
 	Temperature  int
-	FeelsLike    int
-	PrecipTotal  int
+	FeelsLike    string
+	PrecipTotal  string
 	PrecipChance int
 	WindRange    string
 }
 
 const IconPrefix = "wi"
+const IconNA = "wi-na"
 
 var IconMap = map[string]string{
 	"01d": "sunny",

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8" />
+  <title>RPi Hub</title>
+  <style type="text/css">
+    body {
+      font-family: monospace;
+      word-break: keep-all;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 0.8rem;
+    }
+
+    th {
+      font-size: 11rem;
+      font-weight: bold;
+      padding: 0px;
+    }
+
+    td {
+      font-size: 2rem;
+      padding: 7px;
+      text-overflow: ellipsis;
+    }
+
+    #currently {
+      margin-bottom: 0;
+      margin: auto;
+      text-align: left;
+    }
+
+    #currently td {
+      padding: 0px;
+      padding-left: 1rem;
+      width: auto;
+    }
+
+    #forecast {
+      text-align: right;
+    }
+
+    #forecast th,
+    #forecast td {
+      font-size: 1.25rem;
+    }
+
+    #forecast tr td:first-of-type {
+      height: 2.5rem;
+      width: 2.5rem;
+      overflow: visible;
+      padding-left: 1rem;
+    }
+
+    #forecast tr td:nth-of-type(4) {
+      text-align: left;
+    }
+
+    .large-icon {
+      min-width: 200px;
+      max-height: 11rem;
+    }
+
+    .small-icon {
+      height: 3rem;
+      margin: -0.8rem;
+    }
+
+    .no-wrap {
+      white-space: nowrap;
+    }
+
+    #details td {
+      font-size: 0.9rem;
+      padding: 1px;
+      text-align: left;
+    }
+  </style>
+</head>
+
+<body style="width: 580px; height: 800px">
+  <table>
+    <tr>
+      <td>
+        <img class="large-icon" src="static/{{ .Weather.Current.Icon }}.png" />
+      </td>
+      <th>
+        {{ .Weather.Current.Temperature }}<span style="font-size: 25%">&#176;F</span>
+      </th>
+    </tr>
+    <tr>
+      <td>
+        <table id="currently" class="no-wrap">
+          <tr>
+            <td>
+              <img class="small-icon" src="static/wi-thermometer.png" />
+            </td>
+            <td>
+              {{ .Weather.Current.FeelsLike }}&#176;F
+            </td>
+          </tr>
+          <tr>
+            <td><img class="small-icon" src="static/wi-humidity.png" /></td>
+            <td>{{ .Weather.Current.Humidity}}%</td>
+          </tr>
+          <tr>
+            <td>
+              <img class="small-icon" src="static/wi-day-sunny.png" />
+            </td>
+            <td>UVI: {{ .Weather.Current.UVIndex }}</td>
+          </tr>
+          <tr>
+            <td>
+              <img class="small-icon" src="static/wi-cloudy.png" />
+            </td>
+            <td>{{ .Weather.Current.CloudCover }}%</td>
+          </tr>
+        </table>
+      </td>
+      <td>
+        <table id="currently" class="no-wrap">
+          <tr>
+            <td>
+              <img class="small-icon" src="static/wi-raindrops.png" />
+            </td>
+            <td>
+              {{ .Weather.Current.PrecipTotal }} in |
+              {{ .Weather.Current.PrecipChance }}%
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <img class="small-icon" src="static/wi-strong-wind.png" />
+            </td>
+            <td>
+              {{ .Weather.Current.WindRange }} mph
+            </td>
+          </tr>
+          <tr>
+            <td><img class="small-icon" src="static/wi-sunrise.png" /></td>
+            <td>{{ .Weather.Current.Sunrise }}</td>
+          </tr>
+          <tr>
+            <td>
+              <img class="small-icon" src="static/wi-sunset.png" />
+            </td>
+            <td>{{ .Weather.Current.Sunset}}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+  <table>
+    <tr>
+      <th style="font-size: 4rem">{{ .Weather.Date }}</th>
+    </tr>
+  </table>
+  <table id="forecast">
+    {{ with .Weather.Hourly }}
+    {{ range . }}
+    <tr>
+      <th>{{ .Hour }}</th>
+      <td>
+        <img class="small-icon" src="static/{{.Icon}}.png" />
+      </td>
+      <td>
+        {{ .Temperature }}({{ .FeelsLike }})&#176;F
+      </td>
+      <td>
+        {{ .PrecipTotal }} in |
+      </td>
+      <td>{{ .PrecipChance }}%</td>
+      <td>{{ .WindRange }} mph</td>
+    </tr>
+    {{ end }}
+    {{ end }}
+  </table>
+  <table id="details">
+    <tr>
+      <td colspan="2">data.alerts</td>
+    </tr>
+    <tr>
+      <td>data.eufy</td>
+      <td style="text-align: right">
+        {{ .Weather.Location }} ({{ .Weather.LastUpdated }})
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>

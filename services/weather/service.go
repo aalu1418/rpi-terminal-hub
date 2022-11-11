@@ -3,7 +3,7 @@ package weather
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/aalu1418/rpi-terminal-hub/services/base"
@@ -16,6 +16,8 @@ type service struct {
 	client *http.Client
 	url    string
 }
+
+var EMPTY = Parser(types.OneCall{})
 
 // provides a single handler for setting & incrementing metrics
 func New(outgoingMsg chan<- types.Message, key string) types.Service {
@@ -42,11 +44,11 @@ func (s *service) onTick() (msg types.Message) {
 	if err != nil || res == nil || res.StatusCode != 200 {
 		msg.Data = map[string]interface{}{
 			"err": err,
-			"res": res,
+			"res": *res,
 		}
 		return msg
 	}
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		msg.Data = err
 		return msg

@@ -10,9 +10,16 @@ import (
 	"github.com/aalu1418/rpi-terminal-hub/services/connectivity"
 	"github.com/aalu1418/rpi-terminal-hub/services/metrics"
 	"github.com/aalu1418/rpi-terminal-hub/services/server"
+	"github.com/aalu1418/rpi-terminal-hub/services/weather"
 	"github.com/aalu1418/rpi-terminal-hub/types"
 	log "github.com/sirupsen/logrus"
 )
+
+var OWMKey string
+
+func init() {
+	OWMKey = os.Getenv("OWM_KEY")
+}
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -30,6 +37,7 @@ func main() {
 		server.New(messages),
 		metrics.New(messages),
 		connectivity.New(messages),
+		weather.New(messages, OWMKey),
 	}
 
 	// start up post office for message sorting

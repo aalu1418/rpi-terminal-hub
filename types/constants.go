@@ -28,6 +28,7 @@ const (
 	// weather config
 	WEATHER           = "weather"
 	WEATHER_FREQUENCY = 15 * time.Minute
+	WEATHER_LOCATION  = "Westminster, CO"
 	WEATHER_LAT       = "39.86506214649686"
 	WEATHER_LON       = "-105.04846274505923"
 )

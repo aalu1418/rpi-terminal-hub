@@ -2,39 +2,62 @@ package server
 
 import (
 	"context"
+	"embed"
 	"fmt"
+	"html/template"
 	"net/http"
+	"sync"
 
 	"github.com/aalu1418/rpi-terminal-hub/services/base"
+	"github.com/aalu1418/rpi-terminal-hub/services/weather"
 	"github.com/aalu1418/rpi-terminal-hub/types"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 )
 
-func init() {
-	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-		if _, err := w.Write([]byte("pong")); err != nil {
-			log.Errorf("server.ping: %s", err)
-		}
-	})
-
-	http.Handle("/metrics", promhttp.Handler())
-}
+//go:embed static index.html
+var static embed.FS
 
 type service struct {
 	types.Service
-	server *http.Server
+	server   *http.Server
+	template *template.Template
+	data     outputData
+	lock     sync.RWMutex
+}
+
+type outputData struct {
+	Weather types.WeatherParsed
 }
 
 func New(outgoingMsg chan<- types.Message) types.Service {
 	var s service
 	s.Service = base.New(outgoingMsg, types.WEBSERVER, types.INFINITE_TIME, s.onTick, s.processMsg)
 	s.server = &http.Server{Addr: types.WEBSERVER_ADDRESS}
+	s.template = template.Must(template.ParseFS(static, "index.html"))
+	s.data.Weather = weather.EMPTY
 	return &s
 }
 
 // custom Start
 func (s *service) Start(ctx context.Context) error {
+	http.HandleFunc("/ping", func(w http.ResponseWriter, _ *http.Request) {
+		if _, err := w.Write([]byte("pong")); err != nil {
+			log.Errorf("server.ping: %s", err)
+		}
+	})
+
+	http.Handle("/metrics", promhttp.Handler())
+
+	http.Handle("/static/", http.FileServer(http.FS(static)))
+	http.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
+		s.lock.RLock()
+		defer s.lock.RUnlock()
+		if err := s.template.Execute(w, s.data); err != nil {
+			log.Errorf("server.weatherL %s", err)
+		}
+	})
+
 	// start server in go routine
 	go func() {
 		// ErrServerClosed on graceful close
@@ -56,7 +79,22 @@ func (s *service) Stop(ctx context.Context) error {
 }
 
 func (s *service) processMsg(m types.Message) {
-	log.Infof("received msg: %+v", m)
+	if m.To != types.WEBSERVER {
+		log.Errorf("[SERVER] recieved incorrect message: %+v", m)
+		return
+	}
+
+	if m.From == types.WEATHER {
+		weatherData, ok := m.Data.(types.WeatherParsed)
+		if !ok {
+			log.Errorf("[SERVER] could not parse weather message: %+v", m)
+			return
+		}
+		s.lock.Lock()
+		defer s.lock.Unlock()
+		s.data.Weather = weatherData
+		return
+	}
 }
 
 // called once at the very beginning (and after INFINITE_TIME)
