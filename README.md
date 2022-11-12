@@ -143,3 +143,8 @@ pre-commit install && pre-commit install --hook-type pre-push
 Ideas
 
 - Add `traffic` module for driving commutes
+
+Notes
+```bash
+env GOOS=linux GOARCH=arm GOARM=5 go build -o test
+```

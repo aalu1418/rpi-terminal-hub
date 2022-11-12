@@ -10,6 +10,7 @@ import (
 	"github.com/aalu1418/rpi-terminal-hub/services"
 	"github.com/aalu1418/rpi-terminal-hub/services/alerts"
 	"github.com/aalu1418/rpi-terminal-hub/services/connectivity"
+	"github.com/aalu1418/rpi-terminal-hub/services/infrared"
 	"github.com/aalu1418/rpi-terminal-hub/services/metrics"
 	"github.com/aalu1418/rpi-terminal-hub/services/server"
 	"github.com/aalu1418/rpi-terminal-hub/services/weather"
@@ -18,18 +19,26 @@ import (
 )
 
 var (
-	OWMKey string
+	OWMKey     string
+	IRRecorder bool
 )
 
 func init() {
+	flag.BoolVar(&IRRecorder, "record-ir", false, "run IR recorder")
 	flag.StringVar(&OWMKey, "owm", os.Getenv(types.OWM_ENVVAR), "pass in openweathermap api key")
 	flag.Parse()
-	if OWMKey == "" {
-		log.Fatalf("missing openweathermap api key - pass via %s env or --owm flag", types.OWM_ENVVAR)
-	}
 }
 
 func main() {
+	if IRRecorder {
+		infrared.NewRecorder(23)
+		return
+	}
+
+	if OWMKey == "" {
+		log.Fatalf("missing openweathermap api key - pass via %s env or --owm flag", types.OWM_ENVVAR)
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

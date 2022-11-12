@@ -5,7 +5,9 @@ go 1.19
 require (
 	github.com/prometheus/client_golang v1.13.1
 	github.com/sirupsen/logrus v1.9.0
+	github.com/stianeikeland/go-rpio/v4 v4.6.0
 	github.com/stretchr/testify v1.8.1
+	golang.org/x/exp v0.0.0-20221110155412-d0897a79cd37
 )
 
 require (
@@ -19,7 +21,6 @@ require (
 	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
-	golang.org/x/exp v0.0.0-20221110155412-d0897a79cd37 // indirect
 	golang.org/x/sys v0.1.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
