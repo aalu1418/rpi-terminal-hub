@@ -7,31 +7,44 @@ import (
 	"os/signal"
 	"strings"
 
+	"github.com/aalu1418/rpi-terminal-hub/rpio/infrared"
 	"github.com/aalu1418/rpi-terminal-hub/services"
 	"github.com/aalu1418/rpi-terminal-hub/services/alerts"
 	"github.com/aalu1418/rpi-terminal-hub/services/connectivity"
-	"github.com/aalu1418/rpi-terminal-hub/services/infrared"
 	"github.com/aalu1418/rpi-terminal-hub/services/metrics"
 	"github.com/aalu1418/rpi-terminal-hub/services/server"
+	"github.com/aalu1418/rpi-terminal-hub/services/vacuum"
 	"github.com/aalu1418/rpi-terminal-hub/services/weather"
 	"github.com/aalu1418/rpi-terminal-hub/types"
 	log "github.com/sirupsen/logrus"
+	"github.com/stianeikeland/go-rpio/v4"
 )
 
 var (
 	OWMKey     string
 	IRRecorder bool
+	IREmitTest bool
 )
 
 func init() {
-	flag.BoolVar(&IRRecorder, "record-ir", false, "run IR recorder")
 	flag.StringVar(&OWMKey, "owm", os.Getenv(types.OWM_ENVVAR), "pass in openweathermap api key")
+	flag.BoolVar(&IRRecorder, "record-ir", false, "run IR recorder")
+	flag.BoolVar(&IREmitTest, "emit-ir", false, "run IR emit test")
 	flag.Parse()
 }
 
 func main() {
 	if IRRecorder {
-		infrared.NewRecorder(23)
+		if err := infrared.NewRecorder(rpio.Pin(types.IR_RECEIVER)); err != nil {
+			log.Fatalf("[IR] recorder error: %s", err)
+		}
+		return
+	}
+
+	if IREmitTest {
+		if err := infrared.NewEmitter(rpio.Pin(types.IR_EMITTER), vacuum.COMMAND_STARTSTOP); err != nil {
+			log.Fatalf("[IR] emit test error: %s", err)
+		}
 		return
 	}
 

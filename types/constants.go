@@ -26,6 +26,9 @@ const (
 
 	// NWS alert config
 	NWS = "alert-nws"
+
+	// vacuum config
+	VACUUM = "vacuum"
 )
 
 // configurable parameters via -ldflags
@@ -40,8 +43,6 @@ var (
 	// web server config
 	WEBSERVER_ADDRESS = "0.0.0.0:5000"
 
-	// metrics config
-
 	// connectivity config
 	CONN_FREQUENCY = 5 * time.Second  // frequency of polling
 	CONN_TIMEOUT   = 1 * time.Second  // timeout for request
@@ -55,4 +56,17 @@ var (
 
 	// NWS alert config
 	NWS_FREQUENCY = 5 * time.Minute
+
+	// IR config
+	IR_RECEIVER = 22
+	IR_EMITTER  = 18
+
+	// vacuum config
+	VACUUM_SCHEDULE = `{
+	  "Monday": "6:15PM",
+	  "Tuesday": "6:15PM",
+	  "Thursday": "6:15PM",
+	  "Friday": "6:15PM",
+	  "Saturday": "6:15PM"
+	}`
 )
