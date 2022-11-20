@@ -4,104 +4,86 @@ Turning a RPi into a server hub using Raspian OS Lite.
 
 Credits: Icons created by [@erikflowers](https://github.com/erikflowers/weather-icons)
 
-The `main.py` file contains the primary logic of continuously running the code. It handles updating the weather data (every 15 minutes), and also triggering scheduled events (specifically for the robot vacuum). It outputs data as a Flask app at http://0.0.0.0:5000.
+The `main.go` file contains the primary logic of continuously running the code. It handles starting and stopping the various underlying services.
 
-- `--no-eufy`: Useful flag when testing locally where the GPIO libraries are not installed. Skips the eufy related portions in the code.
+**NOTE: PWM usage requires root privleges**
 
-## Environment Variables
+## Configuration
 
-The following environments are needed for all components to work correctly.
-
-| Name      | Description                                                                                                                  | Required |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------- | -------- |
-| `OWM_KEY` | OpenWeatherMap API key, needed for `weather.py` to function                                                                  | Yes      |
-| `SERVER`  | Remote server address, needed for `scripts/triggerServer.sh` to communicate with the correct server, defaults to `localhost` | No       |
-
+- `--owm`: For passing in the OpenWeatherMap api key. This can also be passed via an `OWM` environment variable
+- Configuration of variables in the code can be done via `-ldflags`
+```bash
+go run -ldflags "-X github.com/aalu1418/rpi-terminal-hub/types.WEATHER_LOCATION=hello" main.go
 ```
-OWM_KEY=someRandomAPIKey
-SERVER=192.168.1.104
+- build + upload to RPi commands (using SSH)
+```bash
+env GOOS=linux GOARCH=arm GOARM=5 go build
+scp rpi-terminal-hub pi@<rpi-ip>:/home/pi/
 ```
 
 ## Modules
 
 Various integrations for controlling / reporting devices and information.
 
-### Web Time
+### [service] Web Server
 
-`webTime.py`: Fetches time based on a web API and IP address location. Eliminates the need for calculating daylight savings, etc. It defaults to EST - timezones can be specified in the initialization (`timezone [string]`).
+The web server module provides an user facing endpoint for the weather panel, controlling the vacuum, and prometheus metrics host.
 
-- `fetch()`: Pulls from time API for the given timezone
+- `GET /`: Main endpoint with a stylized HTML page for weather
+- `POST /vacuum`: Used for triggering the IR emitter to issue vacuum commands (`start`, `stop`, `30min`, `home`)
+```bash
+curl -X POST -d "cmd=start" localhost:5000/vacuum
+```
+- `GET /metrics`: prometheus metrics endpoint
 
-### Weather
+### [service] Weather
 
-`weather.py`: Fetches weather based on submitted location, and returns it as a data struct. Takes a `location [string]` parameter (optional, defaults to first entry in [`locations.json`](./data/locations.json)). To find the coordinates of a location follow [this guide for Google Maps](https://support.google.com/maps/answer/18539?co=GENIE.Platform%3DDesktop&hl=en).
+The weather service polls the OpenWeatherMap API for weather data and provides it in a consumable form to the Web Server.
 
-- `fetch()`: Pulls from OpenWeatherMap and returns struct for the server page.
+Learn more here: https://openweathermap.org/api
 
-### Eufy
+### [service] Vacuum
 
-`eufy.py`: Integration with IR emitter + receiver to control a Eufy Robovac 15C. The `eufy.json` file can be regenerated as well for other remotes.
+Uses the IR emitter to control the robotic vacuum and issue commands on a set schedule.
 
-- `pair()`: Sequence for recording various buttons on Eufy remote
-- `emit()`: Command for emitting specified IR commands. Inputs should be a matching string to the stored commands.
+Original inspiration (actual circuit is slightly different): https://www.hackster.io/austin-stanton/creating-a-raspberry-pi-universal-remote-with-lirc-2fd581
 
-### Transit/Traffic
+### [service] Alerts
 
-`transit.py`: Acts as a wrapper for passed in city parameter for specific transit or traffic modules defined for each city.
+Polling and parsing various endpoints to monitor for alerts. Currently supported:
 
-- `fetch()`: Runs the respective fetch command to retrieve and parse data.
-- `data`: The parsed data
-- Each submodule must have the following defined interface within the class:
-  - `init(self)`: no parameters can be passed in, initializes the data needed
-  - `fetch(self)`: no parameters, pulls and processes data into a `[]string`
-  - `data`: Class parameter where the `[]string` is stored
-  - Other functions may be included to assist with retrieving, processing, etc
-  - See the [Toronto Transit (TTC) module](./src/modules/ttc.py) as an example
+- [NOAA/NWS](https://www.weather.gov/documentation/services-web-api) weather alerts for given LAT/LON
 
-### Other
+### [service] Connectivity
 
-- `state.py`: data state management for main loop
-- `commands.py`: simplified command line text for modifying sleep/delays
+Polling a DNS service to determine internet connectivity. Information is reported to the metrics service.
 
-## Web Server
+### [service] Metrics
 
-Endpoint: `GET /`
+Handles various incoming messages from other services and tracks accordingly using prometheus metrics.
 
-- Main endpoint for stylized webpage with all information
+Exporting to Grafana: https://grafana.com/oss/prometheus/exporters/node-exporter/
 
-Endpoint: `GET /raw`
+### [service] Post Office
 
-- Raw data used in stylized webpage
-- Viewable using http://localhost:5000/raw or `curl -X GET localhost:5000/raw`
+Message router for the various services to communicate.
 
-Endpoint: `POST /vacuum`
+### [service] Base
 
-- Example curl request: `curl -X POST -d "cmd=start" localhost:5000/vacuum`
-- Missing `data` will default to `start_stop`
-- Potential commands: `start_stop`, `home`, `circle`, `edge`, `auto`
+Underlying service that provides base functionality for each services incoming and outgoing messages, frequency of processing, etc.
 
-Endpoint: `POST /pull`
+### [GPIO] Infrared
 
-- Runs `git pull` on the repository on remote server
-- Example curl request: `curl -X POST localhost:5000/pull`
+Provides basic utilities for recording and emitting IR PWM signals
 
-Endpoint `GET /logs`
-
-- Returns the `cron.log` file
-- Viewable using http://localhost:5000/logs or `curl -X POST -d "format=cli" localhost:5000/logs`
-- Format can be `web` (default) or `cli`
-
-Endpoint `POST /reboot`
-
-- Restarts the server
-- Example curl request: `curl -X POST localhost:5000/reboot`
-
-Endpoint `POST /pre-push`
-
-- Endpoint called in `pre-push` hook (delay for push before pull/reboot)
-- Example curl request: `curl -X POST localhost:5000/pre-push`
+- `--emit-ir`: flag for testing an IR signal
+- `--record-ir`: flag for recording an IR signal, prints out golang formatted time durations
 
 ## Notes
+
+Setting up SSH on RPi
+
+- https://www.tomshardware.com/reviews/raspberry-pi-headless-setup-how-to,6028.html
 
 Autorun on RPi using CRON
 
@@ -109,18 +91,8 @@ Autorun on RPi using CRON
 - Included a delay to allow internet connection to be established
 
 ```
-@reboot sleep 60 && /usr/bin/python3 /home/pi/rpi-terminal-hub/main.py --server >> ~/cron.log 2>&1
+@reboot sleep 15 && sudo /home/pi/rpi-terminal-hub --owm=<API_KEY> >> ~/cron.log 2>&1
 ```
-
-Terminal Weather
-
-- https://github.com/chubin/wttr.in
-- Used in a previous version (useful for CLI weather app)
-
-IR Receiver + Emitter
-
-- (Circult) https://www.hackster.io/austin-stanton/creating-a-raspberry-pi-universal-remote-with-lirc-2fd581
-- (Python Package) https://github.com/kentwait/ircodec
 
 RPi Timezones
 
@@ -129,17 +101,5 @@ RPi Timezones
 Server Inspiration
 
 - https://shkspr.mobi/blog/2020/02/turn-an-old-ereader-into-an-information-screen-nook-str/
-- Completed Look (interface is a bit outdated): ![](./media/NST_display.jpg)
+- completed look: ![](screenshot.png)
 
-Pre-Commit Hooks
-
-- Used for code formatting and triggering to local server
-
-```bash
-pip3 install pre-commit
-pre-commit install && pre-commit install --hook-type pre-push
-```
-
-Ideas
-
-- Add `traffic` module for driving commutes
