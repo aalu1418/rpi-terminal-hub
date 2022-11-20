@@ -20,6 +20,7 @@ type service struct {
 	types.Service
 	once     bool
 	schedule types.WeeklySchedule
+	out      chan<- types.Message
 	stop     chan struct{}
 }
 
@@ -30,6 +31,7 @@ func New(outgoingMsg chan<- types.Message) types.Service {
 	s.Service = base.New(outgoingMsg, types.VACUUM, time.Second, s.onTick, s.processMsg)
 	s.schedule = types.WeeklySchedule{}
 	s.stop = make(chan struct{})
+	s.out = outgoingMsg
 	return &s
 }
 
@@ -87,9 +89,14 @@ func (s *service) onTick() types.Message {
 	d := s.schedule.Next(time.Now())
 	tick := time.After(d)
 	log.Infof("[VACUUM] scheduled in %s", d)
+	s.out <- types.Message{
+		From: s.Name(),
+		To:   types.WEBSERVER,
+		Data: fmt.Sprintf("%s (next)", time.Now().Add(d).Format("Mon 3:04PM")),
+	}
+
 	select {
 	case <-s.stop:
-		fmt.Println("interrupted")
 		return types.Message{
 			To:   types.POSTOFFICE,
 			Data: "[VACUUM] shutting down trigger",
@@ -105,8 +112,25 @@ func (s *service) onTick() types.Message {
 		}
 	}
 
+	s.out <- types.Message{
+		From: s.Name(),
+		To:   types.WEBSERVER,
+		Data: "running",
+	}
+
+	tick = time.After(30 * time.Minute)
+	select {
+	case <-s.stop:
+		return types.Message{
+			To:   types.POSTOFFICE,
+			Data: "[VACUUM] shutting down trigger",
+		}
+	case <-tick:
+		// continue
+	}
+
 	return types.Message{
 		To:   types.POSTOFFICE,
-		Data: "[VACUUM] IR signal emitted",
+		Data: "[VACUUM] completed",
 	}
 }

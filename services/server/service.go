@@ -33,6 +33,7 @@ type service struct {
 type outputData struct {
 	Weather types.WeatherParsed
 	Alerts  string
+	Vacuum  string
 }
 
 func New(outgoingMsg chan<- types.Message) types.Service {
@@ -72,7 +73,9 @@ func (s *service) Start(ctx context.Context) error {
 	http.HandleFunc("/vacuum", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
-			w.Write([]byte("invalid method"))
+			if _, err := w.Write([]byte("invalid method")); err != nil {
+				log.Errorf("server.vacuum.method %s", err)
+			}
 			return
 		}
 
@@ -99,7 +102,7 @@ func (s *service) Start(ctx context.Context) error {
 		}
 
 		s.out <- types.Message{
-			From: types.WEBSERVER,
+			From: s.Name(),
 			To:   types.VACUUM,
 			Data: cmd,
 		}
@@ -151,10 +154,21 @@ func (s *service) processMsg(m types.Message) {
 		alert, ok := m.Data.(string)
 		if !ok {
 			log.Errorf("[SERVER] could not parse NWS alert message: %+v", m)
+			return
 		}
 		s.lock.Lock()
 		defer s.lock.Unlock()
 		s.data.Alerts = alert
+		return
+	case m.From == types.VACUUM:
+		status, ok := m.Data.(string)
+		if !ok {
+			log.Errorf("[SERVER] could not parse vacuum status message: %+v", m)
+			return
+		}
+		s.lock.Lock()
+		defer s.lock.Unlock()
+		s.data.Vacuum = status
 		return
 	default:
 		log.Infof("[SERVER] received: %+v", m)

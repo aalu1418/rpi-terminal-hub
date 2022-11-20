@@ -37,11 +37,12 @@ func (s *nwsService) onTick() types.Message {
 	}
 
 	res, err := s.client.Get(fmt.Sprintf("https://api.weather.gov/alerts/active?point=%s,%s", types.WEATHER_LAT, types.WEATHER_LON))
-	if err != nil || res == nil || res.StatusCode != 200 {
-		msg.Data = map[string]interface{}{
-			"err": err,
-			"res": *res,
-		}
+	if err != nil {
+		msg.Data = err
+		return msg
+	}
+	if res.StatusCode != 200 {
+		msg.Data = *res
 		return msg
 	}
 	body, err := io.ReadAll(res.Body)
