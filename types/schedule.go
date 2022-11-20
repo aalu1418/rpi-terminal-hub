@@ -9,7 +9,7 @@ import (
 
 func StringToDay(s string) (time.Weekday, error) {
 	for i := 0; i < 7; i++ {
-		if strings.ToLower(time.Weekday(i).String()) == strings.ToLower(s) {
+		if strings.EqualFold(time.Weekday(i).String(), s) {
 			return time.Weekday(i), nil
 		}
 	}

@@ -79,7 +79,9 @@ func (s *service) Start(ctx context.Context) error {
 		bytes, err := io.ReadAll(r.Body)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
+			if _, err := w.Write([]byte(err.Error())); err != nil {
+				log.Errorf("server.vacuum.ioReadAll %s", err)
+			}
 			return
 		}
 
@@ -90,7 +92,9 @@ func (s *service) Start(ctx context.Context) error {
 		}
 		if !exists {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(fmt.Sprintf("invalid command: %s", cmd)))
+			if _, err := w.Write([]byte(fmt.Sprintf("invalid command: %s", cmd))); err != nil {
+				log.Errorf("server.vacuum.exists %s", err)
+			}
 			return
 		}
 
@@ -101,7 +105,9 @@ func (s *service) Start(ctx context.Context) error {
 		}
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(fmt.Sprintf("%s cmd emitted", strings.ToUpper(cmd))))
+		if _, err := w.Write([]byte(fmt.Sprintf("%s cmd emitted", strings.ToUpper(cmd)))); err != nil {
+			log.Errorf("server.vacuum.output %s", err)
+		}
 	})
 
 	// start server in go routine
