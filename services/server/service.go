@@ -5,10 +5,13 @@ import (
 	"embed"
 	"fmt"
 	"html/template"
+	"io"
 	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/aalu1418/rpi-terminal-hub/services/base"
+	"github.com/aalu1418/rpi-terminal-hub/services/vacuum"
 	"github.com/aalu1418/rpi-terminal-hub/services/weather"
 	"github.com/aalu1418/rpi-terminal-hub/types"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -24,6 +27,7 @@ type service struct {
 	template *template.Template
 	data     outputData
 	lock     sync.RWMutex
+	out      chan<- types.Message
 }
 
 type outputData struct {
@@ -37,6 +41,7 @@ func New(outgoingMsg chan<- types.Message) types.Service {
 	s.server = &http.Server{Addr: types.WEBSERVER_ADDRESS}
 	s.template = template.Must(template.ParseFS(static, "index.html"))
 	s.data.Weather = weather.EMPTY
+	s.out = outgoingMsg
 	return &s
 }
 
@@ -62,6 +67,41 @@ func (s *service) Start(ctx context.Context) error {
 		if err := s.template.Execute(w, s.data); err != nil {
 			log.Errorf("server.weatherL %s", err)
 		}
+	})
+
+	http.HandleFunc("/vacuum", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			w.Write([]byte("invalid method"))
+			return
+		}
+
+		bytes, err := io.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		cmd := string(bytes)
+		var exists bool
+		for _, v := range vacuum.Calls {
+			exists = exists || v == cmd
+		}
+		if !exists {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(fmt.Sprintf("invalid command: %s", cmd)))
+			return
+		}
+
+		s.out <- types.Message{
+			From: types.WEBSERVER,
+			To:   types.VACUUM,
+			Data: cmd,
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(fmt.Sprintf("%s cmd emitted", strings.ToUpper(cmd))))
 	})
 
 	// start server in go routine

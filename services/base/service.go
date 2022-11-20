@@ -47,8 +47,9 @@ func (s *service) Start(_ context.Context) error {
 		return fmt.Errorf("service already started")
 	}
 
-	go s.run()
-	s.wg.Add(1)
+	go s.runOutgoing()
+	go s.runIncoming()
+	s.wg.Add(2)
 	s.started = true
 	return nil
 }
@@ -73,8 +74,31 @@ func (s *service) Stop(_ context.Context) error {
 	return nil
 }
 
-func (s *service) run() {
+func (s *service) runOutgoing() {
 	tick := time.After(0)
+	defer s.wg.Done()
+
+	for {
+		select {
+		case <-s.stop:
+			return
+		case <-tick:
+			start := time.Now()                                   // track starting time
+			msg := s.onTick()                                     // run msg generating function
+			msg.From = s.name                                     // always use name as from
+			tick = time.After(s.tickInterval - time.Since(start)) // reset tick
+
+			// handle full outoing queue
+			if len(s.outgoingMsg) == types.MAX_QUEUE {
+				log.Errorf("[CRITICAL] outgoing message queue is full, msg dropped: %+v", msg)
+				continue
+			}
+			s.outgoingMsg <- msg
+		}
+	}
+}
+
+func (s *service) runIncoming() {
 	defer s.wg.Done()
 
 	for {
@@ -88,18 +112,6 @@ func (s *service) run() {
 				continue // continue loop
 			}
 			s.processMsg(m)
-		case <-tick:
-			start := time.Now()                                   // track starting time
-			msg := s.onTick()                                     // run msg generating function
-			msg.From = s.name                                     // always use name as from
-			tick = time.After(s.tickInterval - time.Since(start)) // reset tick
-
-			// handle full outoing queue
-			if len(s.outgoingMsg) == types.MAX_QUEUE {
-				log.Errorf("[CRITICAL] outgoing message queu is full, msg dropped: %+v", msg)
-				continue
-			}
-			s.outgoingMsg <- msg
 		}
 	}
 }

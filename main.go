@@ -59,7 +59,7 @@ func main() {
 	signal.Notify(system, os.Interrupt)
 
 	// start message queue
-	messages := make(chan types.Message)
+	messages := types.NewQueue()
 	defer close(messages)
 
 	// start up services
@@ -69,6 +69,7 @@ func main() {
 		connectivity.New(messages),
 		weather.New(messages, OWMKey),
 		alerts.NewNWS(messages),
+		vacuum.New(messages),
 	}
 
 	// start up post office for message sorting
