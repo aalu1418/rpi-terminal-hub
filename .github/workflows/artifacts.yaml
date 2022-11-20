@@ -11,8 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: "go.mod"
+          check-latest: true
+      - run: env GOOS=linux GOARCH=arm GOARM=5 go build -o rpi-terminal-hub-arm
+      - run: go build -o rpi-terminal-hub-ubuntu
       - name: Create release
         uses: softprops/action-gh-release@v1
-        # with:
-        #   files: |
-        #     ../chromeExtension-newTab.crx
+        with:
+          files: |
+            rpi-terminal-hub-arm
+            rpi-terminal-hub-ubuntu
