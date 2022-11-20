@@ -46,6 +46,8 @@ Learn more here: https://openweathermap.org/api
 
 Uses the IR emitter to control the robotic vacuum and issue commands on a set schedule.
 
+Original inspiration (actual circuit is slightly different): https://www.hackster.io/austin-stanton/creating-a-raspberry-pi-universal-remote-with-lirc-2fd581
+
 ### [service] Alerts
 
 Polling and parsing various endpoints to monitor for alerts. Currently supported:
@@ -60,6 +62,8 @@ Polling a DNS service to determine internet connectivity. Information is reporte
 
 Handles various incoming messages from other services and tracks accordingly using prometheus metrics.
 
+Exporting to Grafana: https://grafana.com/oss/prometheus/exporters/node-exporter/
+
 ### [service] Post Office
 
 Message router for the various services to communicate.
@@ -68,14 +72,18 @@ Message router for the various services to communicate.
 
 Underlying service that provides base functionality for each services incoming and outgoing messages, frequency of processing, etc.
 
-### [utility] GPIO
+### [GPIO] Infrared
 
-Provides basic utilities for recording and emitting PWM signals
+Provides basic utilities for recording and emitting IR PWM signals
 
 - `--emit-ir`: flag for testing an IR signal
 - `--record-ir`: flag for recording an IR signal, prints out golang formatted time durations
 
 ## Notes
+
+Setting up SSH on RPi
+
+- https://www.tomshardware.com/reviews/raspberry-pi-headless-setup-how-to,6028.html
 
 Autorun on RPi using CRON
 
@@ -85,10 +93,6 @@ Autorun on RPi using CRON
 ```
 @reboot sleep 15 && sudo /home/pi/rpi-terminal-hub --owm=<API_KEY> >> ~/cron.log 2>&1
 ```
-
-IR Receiver + Emitter
-
-- similar circult (pins are slightly different) https://www.hackster.io/austin-stanton/creating-a-raspberry-pi-universal-remote-with-lirc-2fd581
 
 RPi Timezones
 
