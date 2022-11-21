@@ -41,11 +41,16 @@ func (s *service) onTick() (msg types.Message) {
 	}
 
 	res, err := s.client.Get(s.url)
-	if err != nil || res == nil || res.StatusCode != 200 {
-		msg.Data = map[string]interface{}{
-			"err": err,
-			"res": *res,
-		}
+	if err != nil {
+		msg.Data = err
+		return msg
+	}
+	if res == nil {
+		msg.Data = fmt.Errorf("[CRITICAL] res is nil")
+		return msg
+	}
+	if res.StatusCode != 200 {
+		msg.Data = *res
 		return msg
 	}
 	body, err := io.ReadAll(res.Body)

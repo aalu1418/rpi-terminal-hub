@@ -41,6 +41,10 @@ func (s *nwsService) onTick() types.Message {
 		msg.Data = err
 		return msg
 	}
+	if res == nil {
+		msg.Data = fmt.Errorf("[CRITICAL] res is nil")
+		return msg
+	}
 	if res.StatusCode != 200 {
 		msg.Data = *res
 		return msg
