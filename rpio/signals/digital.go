@@ -29,15 +29,31 @@ func (s Signal) Run(high, low func()) {
 func (s Signal) Freq(hz int) (new Signal) {
 	period := time.Second / time.Duration(hz)
 
+	var next time.Duration
 	for i, v := range s {
 		if i%2 == 0 { // high
-			for j := 0; j < int(v/period); j++ {
-				new = append(new, period/2)
-				new = append(new, period/2)
+			count := int(v / period)
+			for j := 0; j < count; j++ {
+				new = append(new, period/2) // high
+
+				// handle cases where last period
+				if j == count-1 {
+					// if last signal, append low
+					if i == len(s)-1 {
+						new = append(new, period/2)
+					} else {
+						// if last period of pulse, combine with low later
+						next = period / 2
+					}
+
+				} else {
+					new = append(new, period/2)
+				}
 			}
 
 		} else { // low
-			new = append(new, v)
+			new = append(new, v+next)
+			next = 0
 		}
 	}
 
