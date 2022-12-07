@@ -25,8 +25,9 @@ func (l LEDs) Build() (s signals.Signal) {
 	for _, v := range l {
 		r, g, b, _ := v.RGBA()
 
-		s = append(s, encode(r)...)
+		// GRB encoding
 		s = append(s, encode(g)...)
+		s = append(s, encode(r)...)
 		s = append(s, encode(b)...)
 	}
 
