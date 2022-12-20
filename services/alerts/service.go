@@ -126,7 +126,7 @@ func (s *nwsService) onTick() types.Message {
 			output = append(output, fmt.Sprintf(
 				"%s %s: %s - %s",
 				k,
-				strings.Title(v.Level.String()),
+				v.Level.String(),
 				v.Start.Format("1/02 3PM"),
 				v.End.Format(format),
 			))

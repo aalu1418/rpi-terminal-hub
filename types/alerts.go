@@ -34,7 +34,7 @@ const (
 )
 
 var (
-	alertLevelStr = []string{"advisory", "watch", "warning"}
+	alertLevelStr = []string{"Advisory", "Watch", "Warning"}
 )
 
 type AlertLevel uint8
@@ -50,7 +50,7 @@ func (al AlertLevel) String() string {
 
 func ParseAlertLevel(s string) AlertLevel {
 	for i, v := range alertLevelStr {
-		if v == strings.ToLower(s) {
+		if strings.ToLower(v) == strings.ToLower(s) {
 			return AlertLevel(i)
 		}
 	}
