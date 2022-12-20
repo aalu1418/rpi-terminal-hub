@@ -1,6 +1,9 @@
 package types
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 // only defines a subset of interested parameters
 type NWSAlerts struct {
@@ -20,4 +23,42 @@ type NWSAlertProps struct {
 	Severity    string    `json:"severity"`
 	Effective   time.Time `json:"effective"`
 	Expires     time.Time `json:"expires"`
+	Ends        time.Time `json:"ends"`
+}
+
+const (
+	ADVISORY = AlertLevel(iota)
+	WATCH
+	WARNING
+	INVALID
+)
+
+var (
+	alertLevelStr = []string{"advisory", "watch", "warning"}
+)
+
+type AlertLevel uint8
+
+func (al AlertLevel) String() string {
+
+	if int(al) >= len(alertLevelStr) {
+		return "NA"
+	}
+
+	return alertLevelStr[al]
+}
+
+func ParseAlertLevel(s string) AlertLevel {
+	for i, v := range alertLevelStr {
+		if v == strings.ToLower(s) {
+			return AlertLevel(i)
+		}
+	}
+	return INVALID
+}
+
+type ParsedAlert struct {
+	Level AlertLevel
+	Start time.Time
+	End   time.Time
 }

@@ -61,34 +61,80 @@ func (s *nwsService) onTick() types.Message {
 		return msg
 	}
 
-	out := []string{}
+	// coalesce alerts
+	out := map[string]types.ParsedAlert{}
 	for _, v := range alerts.Features {
-		// only show second date if different
-		format := "1/02 3PM"
-		if v.Properties.Effective.Day() == v.Properties.Expires.Day() && v.Properties.Effective.Month() == v.Properties.Expires.Month() {
-			format = "3PM"
-		}
-
 		severity := v.Properties.Severity
 		if len(severity) > 3 {
 			severity = severity[:3]
 		}
 
-		out = append(out, fmt.Sprintf(
-			"[%s] %s: %s - %s",
+		ind := strings.LastIndex(strings.TrimSpace(v.Properties.Event), " ")
+		sev := types.ParseAlertLevel(v.Properties.Event[ind+1:])
+		heading := fmt.Sprintf("[%s] %s",
 			severity,
-			v.Properties.Event,
-			v.Properties.Effective.Format("1/02 3PM"),
-			v.Properties.Expires.Format(format),
-		))
+			v.Properties.Event[:ind],
+		)
+
+		if a, exists := out[heading]; exists {
+			// handle increased level (overwrite)
+			if sev > a.Level {
+				a.Level = sev
+				a.Start = v.Properties.Effective
+				a.End = v.Properties.Ends
+
+				out[heading] = a
+				continue
+			}
+
+			// skip processing if lower level
+			if sev < a.Level {
+				continue
+			}
+
+			// if same level
+			// handling combining times
+			if v.Properties.Effective.Before(a.Start) {
+				a.Start = v.Properties.Effective
+			}
+			if a.End.Before(v.Properties.Ends) {
+				a.End = v.Properties.Ends
+			}
+
+			out[heading] = a
+			continue
+		}
+
+		out[heading] = types.ParsedAlert{
+			Level: sev,
+			Start: v.Properties.Effective,
+			End:   v.Properties.Ends,
+		}
 	}
 
+	// printing
+	output := []string{}
 	if len(out) == 0 {
-		out = append(out, "N/A")
+		output = append(output, "N/A")
+	} else {
+		for k, v := range out {
+			// only show second date if different
+			format := "1/02 3PM"
+			if v.Start.Day() == v.End.Day() && v.Start.Month() == v.End.Month() {
+				format = "3PM"
+			}
+			output = append(output, fmt.Sprintf(
+				"%s %s: %s - %s",
+				k,
+				strings.Title(v.Level.String()),
+				v.Start.Format("1/02 3PM"),
+				v.End.Format(format),
+			))
+		}
 	}
 
 	return types.Message{
 		To:   types.WEBSERVER,
-		Data: strings.Join(out, ", "),
+		Data: strings.Join(output, ", "),
 	}
 }
