@@ -50,7 +50,7 @@ func (al AlertLevel) String() string {
 
 func ParseAlertLevel(s string) AlertLevel {
 	for i, v := range alertLevelStr {
-		if strings.ToLower(v) == strings.ToLower(s) {
+		if strings.EqualFold(v, s) {
 			return AlertLevel(i)
 		}
 	}
