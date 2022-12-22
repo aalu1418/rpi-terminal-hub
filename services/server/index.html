@@ -14,13 +14,14 @@
       border-collapse: collapse;
       width: 100%;
       text-align: center;
-      margin-bottom: 0.8rem;
+      margin-bottom: 0.4rem;
     }
 
     th {
       font-size: 11rem;
       font-weight: bold;
       padding: 0px;
+      white-space: nowrap;
     }
 
     td {
@@ -93,6 +94,8 @@
         {{ .Weather.Current.Temperature }}<span style="font-size: 25%">&#176;F</span>
       </th>
     </tr>
+  </table>
+  <table style="table-layout: fixed">
     <tr>
       <td>
         <table id="currently" class="no-wrap">
