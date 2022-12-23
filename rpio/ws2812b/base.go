@@ -7,19 +7,39 @@ import (
 	"time"
 
 	"github.com/aalu1418/rpi-terminal-hub/rpio/signals"
+	rpio "github.com/stianeikeland/go-rpio/v4"
 )
 
 // https://www.arrow.com/en/research-and-events/articles/protocol-for-the-ws2812b-programmable-led
 
 var (
-	ONE_HIGH  = 800 * time.Nanosecond
-	ONE_LOW   = 450 * time.Nanosecond
-	ZERO_HIGH = 400 * time.Nanosecond
-	ZERO_LOW  = 850 * time.Nanosecond
+	ONE_HIGH  = 650 * time.Nanosecond
+	ONE_LOW   = 300 * time.Nanosecond
+	ZERO_HIGH = 250 * time.Nanosecond
+	ZERO_LOW  = 700 * time.Nanosecond
 	RESET     = 300 * time.Microsecond
 )
 
 type LEDs []color.Color
+
+func New(pin rpio.Pin, leds LEDs) error {
+	if err := rpio.Open(); err != nil {
+		return err
+	}
+	defer rpio.Close()
+
+	s := leds.Build()
+	fmt.Println(s)
+
+	pin.Output()
+
+	s.Run(
+		func() { pin.High() },
+		func() { pin.Low() },
+	)
+
+	return nil
+}
 
 func (l LEDs) Build() (s signals.Signal) {
 	for _, v := range l {

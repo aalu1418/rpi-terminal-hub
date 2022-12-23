@@ -29,6 +29,10 @@ const (
 
 	// vacuum config
 	VACUUM = "vacuum"
+
+	// clock config
+	CLOCK           = "clock"
+	CLOCK_FREQUENCY = time.Second
 )
 
 // configurable parameters via -ldflags
@@ -69,4 +73,7 @@ var (
 	  "Friday": "6:15PM",
 	  "Saturday": "6:15PM"
 	}`
+
+	// clock config
+	CLOCK_PIN = 4
 )

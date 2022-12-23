@@ -10,6 +10,7 @@ import (
 	"github.com/aalu1418/rpi-terminal-hub/rpio/infrared"
 	"github.com/aalu1418/rpi-terminal-hub/services"
 	"github.com/aalu1418/rpi-terminal-hub/services/alerts"
+	"github.com/aalu1418/rpi-terminal-hub/services/clock"
 	"github.com/aalu1418/rpi-terminal-hub/services/connectivity"
 	"github.com/aalu1418/rpi-terminal-hub/services/metrics"
 	"github.com/aalu1418/rpi-terminal-hub/services/server"
@@ -24,12 +25,14 @@ var (
 	OWMKey     string
 	IRRecorder bool
 	IREmitTest bool
+	ClockDemo  bool
 )
 
 func init() {
 	flag.StringVar(&OWMKey, "owm", os.Getenv(types.OWM_ENVVAR), "pass in openweathermap api key")
 	flag.BoolVar(&IRRecorder, "record-ir", false, "run IR recorder")
 	flag.BoolVar(&IREmitTest, "emit-ir", false, "run IR emit test")
+	flag.BoolVar(&ClockDemo, "clock-demo", false, "run clock demo")
 	flag.Parse()
 }
 
@@ -44,6 +47,13 @@ func main() {
 	if IREmitTest {
 		if err := infrared.NewEmitter(rpio.Pin(types.IR_EMITTER), vacuum.COMMAND_STARTSTOP); err != nil {
 			log.Fatalf("[IR] emit test error: %s", err)
+		}
+		return
+	}
+
+	if ClockDemo {
+		if err := clock.Demo(rpio.Pin(types.CLOCK_PIN)); err != nil {
+			log.Fatalf("[CLOCK] demo error: %s", err)
 		}
 		return
 	}
