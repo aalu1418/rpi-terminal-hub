@@ -15,8 +15,8 @@ func Parser(data types.OneCall) types.WeatherParsed {
 	}
 
 	out := types.WeatherParsed{
-		Date:        timeParser(data.Current.Dt).Format("Mon 02 Nov"),
-		LastUpdated: time.Now().Format("Nov 2 @ 3:04 PM"),
+		Date:        timeParser(data.Current.Dt).Format("Mon 02 Jan"),
+		LastUpdated: time.Now().Format("Jan 2 @ 3:04 PM"),
 		Location:    types.WEATHER_LOCATION,
 		Current:     weatherParser(data.Current),
 		Hourly:      [4]types.WeatherParsedStatus{},
