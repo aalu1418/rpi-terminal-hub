@@ -32,7 +32,7 @@ The web server module provides an user facing endpoint for the weather panel, co
 - `GET /`: Main endpoint with a stylized HTML page for weather
 - `POST /vacuum`: Used for triggering the IR emitter to issue vacuum commands (`start`, `stop`, `30min`, `home`)
 ```bash
-curl -X POST -d "cmd=start" localhost:5000/vacuum
+curl -X POST -d "start" localhost:5000/vacuum
 ```
 - `GET /metrics`: prometheus metrics endpoint
 
