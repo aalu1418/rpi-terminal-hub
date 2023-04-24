@@ -63,10 +63,10 @@ var (
 
 	// vacuum config
 	VACUUM_SCHEDULE = `{
-	  "Monday": "6:15PM",
+	  "Sunday": "6:15PM",
 	  "Tuesday": "6:15PM",
+	  "Wednesday": "6:15PM",
 	  "Thursday": "6:15PM",
-	  "Friday": "6:15PM",
 	  "Saturday": "6:15PM"
 	}`
 )
